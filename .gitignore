@@ -1,2 +1,6 @@
 
 .gradle
+
+# ignore vim files
+*.swp
+*.swo
