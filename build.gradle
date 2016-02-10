@@ -1,0 +1,32 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'application'
+
+mainClassName = "nl.uu.mas.bdyj.Main"
+
+def javaVersion = 1.8
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+version = '1'
+jar {
+    manifest {
+		attributes 'Implementation-Title': 'Multi Agent Systems',
+	   'Implementation-Version':version
+   }
+}
+
+repositories {
+    mavenCentral()
+	mavenLocal()
+	maven{
+		url "http://jade.tilab.com/maven/"
+	}
+}
+
+dependencies {
+
+	// simple log facade (easily swap the logging backend with this)
+	compile "org.slf4j:slf4j-simple:1.7.13"
+
+	compile "com.tilab.jade:jade:4.4.0"
+}
