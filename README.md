@@ -10,6 +10,6 @@ https://www.youtube.com/watch?v=ZDR433b0HJY&feature=youtu.be&t=250
 
 # Build Guide
 
-./gradlew run
+	./gradlew run
 
 Should fetch gradle and all dependencies (may take a while the first time)
