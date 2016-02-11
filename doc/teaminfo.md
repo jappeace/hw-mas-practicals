@@ -4,12 +4,14 @@ programming skill: ... C++, C, C# Java, Scala, Groovy, PHP, Python, Shell,
 Rust, HTMLx
 
 email: j.t.klooster@students.uu.nl
+I'm not a number: 5771803
 
-# Delian wu
+# Deliang wu
 academic direction: automation,
 programming skill: Hardware , Verilog (10 years), Software, C/C++ (2 months), no Java experience.
 
 email: d.wu@students.uu.nl
+id: 5622182
 
 # Bram Zijlstra
  Bachelor Philosophy in Groningen and after that I took an internship in
