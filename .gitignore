@@ -4,3 +4,11 @@
 # ignore vim files
 *.swp
 *.swo
+
+#JADE generated
+APDescription.txt
+MTPs-Main-Container.txt
+
+#InteliJ
+multi-agent-systems.iml
+.idea
