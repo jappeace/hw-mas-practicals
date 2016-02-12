@@ -1,5 +1,2 @@
-<<<<<<< HEAD
 change something
-=======
 dsfdfasdf adf adf ads fads fadsf 
->>>>>>> origin/master
