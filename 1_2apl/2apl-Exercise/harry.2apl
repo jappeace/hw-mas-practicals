@@ -1,0 +1,47 @@
+include: person.2apl;
+
+beliefs:
+  trap(0, 0).
+  clean( blockWorld ) :- not bomb(X,Y) , not carry(bomb).
+
+beliefupdates:
+  { carry(bomb) }     Drop()   { not carry(bomb) }
+  { not carry(bomb) } PickUp() { carry(bomb) }
+
+plans:
+  startup(0, 1, blue);
+
+goals:
+  clean( blockWorld ).
+
+pgrules:
+  clean( blockWorld ) <- bomb( X, Y ) |
+  {
+    goto( X, Y );
+    @blockworld( pickup( ), _ );
+		PickUp();
+		-bomb( X, Y );
+    goto(0, 0);
+		@blockworld( drop( ), _ );
+		Drop();
+  }
+
+pcrules:
+  message( sally, inform, La, On, bombAt( X, Y ) ) <- true |
+  {   
+    if B( not bomb( A, B ) ) {
+      +bomb(X, Y);
+      adoptz( clean( blockWorld ) );
+    }
+    else { 
+			+bomb( X, Y );
+		}
+  }
+
+prrules:
+  @blockworld( pickup(), _ ); REST; <- true |
+  {
+    @blockworld( sensePosition(), POS );
+    B(POS = [X,Y]);
+    -bomb(X, Y );
+  }

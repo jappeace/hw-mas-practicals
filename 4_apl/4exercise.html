@@ -1,0 +1,96 @@
+
+<!-- saved from url=(0065)http://www.cs.uu.nl/docs/vakken/mas/2aplContractNet/exercise.html -->
+<html hola_ext_inject="ready"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Multiagent Systems</title>
+<style type="text/css"></style></head>
+
+<body bgcolor="#FBF2E5" marginwidth="0" marginheight="0" topmargin="0" leftmargin="10" scroll="0" hola-ext-player="1">
+<center>
+  <h1>MAS -- Exercise: Contract-Net Protocol</h1>
+</center>
+<hr width="80%" size="4" align="center">
+
+The purpose of this exercise is to learn about protocols for agent communication and distributed problem solving methods. The exercise is to develop a distributed application that makes use of the  <i>Contract-Net Protocol</i> [Smith, 1980, Smith &amp; Davis, 1983]. Carefully study Wooldridge 2009, pp 156 -- 158 and the original papers. The FIPA version [2002] is detailed, but uses a different terminology.
+
+<p></p><div align="center">
+<img src="./Multiagent Systems_files/fipa_cnp.gif" width="360" alt="FIPA version of contract net protocol">
+<br>
+Figure 1: FIPA version of Contract Net Protocol
+</div>
+
+
+<h2> Protocol</h2>
+
+
+<p>Agents (nodes in a network)  use the protocol to make contracts about how they should
+allocate tasks.  We distinguish  a <i>manager</i> node and  possible <i>contractor</i> nodes. The manager analyzes his problem, sends out a task announcement to all possible contractors on the network, receives bids from the contractors and after careful evaluation, awards the contract to one (or more) of the contractors. 
+
+</p><p>For each bidding cycle, the communication involves  the following message types:
+
+</p><ul>
+    <li>
+ <b>Task announcement:</b> The manager announces a task by a broadcast  to the network. A task announcement message includes abstract information about the task, expected capabilities of    potential contractors, the information that a bid should contain, and a deadline for when bids should be received. 
+
+     </li><li> <b>Bid:</b> Idle nodes  receive and evaluate the announcement. Nodes with the appropriate resources, expertise, and information reply to the manager    with bids that indicate their suitability to perform the task.
+
+     </li><li> <b>Award :</b> After a specific  deadline has passed, the manager evaluates the bids and awards the task to the most suitable node or to several suitable nodes if redundancy is needed to ensure reliability. The other bidders are notified with some kind of cancel message.
+
+     </li><li> <b>Report messages:</b>  after the contract has been awarded, the manager supplies task information and the contractor reports progress and the eventual result (completion or failure). This phase also contains requests for additional information, and subsequent informs. 
+</li></ul>
+
+
+<h2> Application</h2>
+
+In this exercise we will use the contact-net protocol for the following  task and domain: <i>configuration</i> of <i>computer hardware</i>. Computers consist of components, such as a processor, a case, a motherboard and possibly a graphical processor. These components are typically made by different producers. A computer retail company like DELL needs to get the best deal for each component from different vendors. For this exercise, an environment .jar file is not needed, just implement the manager and contractor agents. 
+
+<p> 
+
+</p><h2>Exercise</h2>
+
+<ol> <li> Give a detailed specification of one cycle of the contract-net protocol for computer hardware configuration. Specify the process, the message types and the possible content of messages. The content of messages depends on how computers and components are specified (see below for details). This can be written out and submitted in a simple .txt file.
+
+</li><li> Implement and test one bidding cycle of the contract-net protocol for a manager agent who needs a number of computers with specific specification, and 3 contractor agents, each with their own set of components at different prices.s<br> <br>
+The manager agent can have a list of (needed) computers in its beliefbase. Each computer can be specified by means of a fact with the following structure.<br><br>   
+
+<b>pc(number, case, motherboard, processor, graphics)</b><br><br>
+
+where number is a natural number representing the number of needed computers, case, motherboard, processor and graphics are the name of the product (e.g., antex, ATI RADEON 7000, etc). You can use the following files for the three contractor agents:<br><br>
+<a href="http://www.cs.uu.nl/docs/vakken/mas/2aplContractNet/components1.pl">components1.pl</a><br> 
+<a href="http://www.cs.uu.nl/docs/vakken/mas/2aplContractNet/components2.pl">components2.pl</a><br> 
+<a href="http://www.cs.uu.nl/docs/vakken/mas/2aplContractNet/components3.pl">components3.pl</a><br> <br>
+
+Each contractor has a set of components at its disposal and can make bids by means of a set of components that the manager can use to assemble computers. Components can be specified by means a fact with the structure as indicated in the components prolog file. In the example of a PC case it is the following: <br><br>   
+
+<b>pc_case( Manufacturer, Type, Shape, ATX, Power (watt), Color, Suitable For, Price )</b><br><br>  
+ 
+<p> You can avoid  deadlines by requiring that each node always sends a response, either positively or negatively. The evaluation of bids by the manager agent should be such that the needed computers can be assembled with the lowest amount of money. 
+</p>
+<br>
+<b>Bonus:</b> Notice that in the structure of the PC components several other attributes like color and type are mentioned. For a bonus grade, expand your code so that the manager can ask for pc components by only specifying some attributes of the component. Furthermore, make sure that the contractor searches its beliefbase for the cheapest component that satisfies all requests from the manager. 
+</li></ol>
+
+
+<h2>References</h2>
+
+<ul>
+
+<li> FIPA, <a href="http://www.fipa.org/specs/fipa00029/">FIPA contract Net Interaction Protocol Specification (SC00029)</a>, Foundation for Intelligent Physical Agents, 2002.
+
+</li><li> FIPA, <a href="http://www.fipa.org/specs/fipa00026/">FIPA Request Interaction Protocol Specification (SC00026)</a>, Foundation for Intelligent
+Physical Agents, 2002.
+
+</li><li> J. McDermott. R1: A rule-based configurer of computer systems. Artificial Intelligence, 19:39--88, 1982.
+
+</li><li> Reid G. Smith: The contract net protocol. High-level communication and control in a
+distributed problem solver. IEEE Transactions on Computers 29(12), 1104 - 1113. December 1980.
+</li><li> Reid G. Smith, Randall Davis: Negotiation as a metaphor for distributed
+problem solving. Artificial Intelligence 20, 63 - 109, 1983.
+</li><li> Mark Stefik, Introduction to Knowledge Systems, Morgan Kaufmann, 1995.
+
+</li><li>  Michael Wooldridge: An Introduction to MultiAgent Systems (Second Edition), Wiley, 2009.
+</li></ul>
+
+
+
+
+</body></html>

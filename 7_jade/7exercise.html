@@ -1,0 +1,61 @@
+<html>
+<head>
+<title>Multiagent Systems: exercise 5</title>
+</head>
+
+<body bgcolor="#FBF2E5" marginwidth="0" marginheight="0" topmargin="0" leftmargin="10" scroll="0">
+<center>
+  <h1>MAS -- Exercise: Auction</h1>
+</center>
+<hr width="80%" size="4" align="center">
+
+The purpose of this exercise is to learn about auctions. The exercise is to develop a distributed application in Jade that makes use of an <i>English Auction</i> protocol to distribute some good.
+
+<h2>Auction</h2>
+
+Study the rules of an English Auction [1,2]. Each client has a a bidding strategy, that depends on its total budget, the remaining budget and the product for sale. The auctioneer has a bottom price. If the good cannot be sold for that price, it remains in store. 
+
+<p align="center">
+<img src="auctioneer.gif" height="160">
+<img src="kast.jpg" height="160">
+</p>
+ 
+ 
+<h2>Application</h2> 
+
+Auctions are useful to distribute goods that are scarce and have a different value for different agents. One example is antiques. In this exercise you will apply the auction to an antique sale. At the web site of the well-known Amsterdam auction house <a href="http://www.deeland.nl/">De Eland</a> you will find many regulations, for example about payment and delivery. Lets assume that "De Eland" wants to start an separate internet antiques sale.  You must develop a prototype of an auctioning system, to test whether this is feasible. 
+
+
+<h2>Exercise</h2>
+
+<ol>
+<li>
+Design, implement and test an auctioneer agent and several buyer agents in Jade, which can carry out an English auction [2]. 
+
+<li>
+Modify your design and program to implement a Dutch Auction and a second-price sealed bid auction in Jade [2]. Make minimal changes in your original design and program. 
+</ol>
+
+<h2>Deliverables</h2>
+<ol>
+<li> The implementations of the English, Dutch and second-price sealed bid auction. Be sure to also add comments in your code, and make sure that your code compiles and runs without errors!
+</li>
+<li>
+A short document describing how your program works, what design choices you made and how the code can be run. Be sure to also include your student number in this document.
+</li>
+</ol>
+
+<h2>References</h2>
+
+<ol>
+
+<li> Sandholm, T. Distributed Rational Decision Making, in: G. Weiss (ed.) Multiagent Systems, 201 -258, MIT Press, Cambridge, MA, 1999. 
+
+<li> Michael Wooldridge: An Introduction to MultiAgent Systems, Wiley, 2002.
+</ol>
+
+
+</body>
+</html>
+
+

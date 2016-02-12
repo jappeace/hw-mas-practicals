@@ -1,0 +1,54 @@
+pcrules:
+  goto( X, Y ) <- true |
+  {
+    @blockworld( sensePosition(), POS );
+    B(POS = [A,B]);
+    if (A > X) then
+    { 
+		  @blockworld( west(), _ );
+      goto( X, Y );
+    }
+    else if (A < X) then
+    { 
+		  @blockworld( east(), _ );
+      goto( X, Y );
+    }
+    else if (B > Y) then
+    { 
+		  @blockworld( north(), _ );
+      goto( X, Y );
+    }
+    else if (B < Y) then
+    { 
+		  @blockworld( south(), _ );
+      goto( X, Y );
+    }
+  }
+	
+	startup(X,Y,C) <- true |
+  {
+    @blockworld( enter(X, Y, C), _);
+		
+    @blockworld( getWorldSize(), WS);
+    B(WS = [Width,Height]);
+		+worldSize(Width, Height);
+		
+    @blockworld( getSenseRange(), SR );
+		B(SR = [S]);		
+    +senseRange(S);
+  }
+	
+prrules:
+	@blockworld( north(), _); REST; <- true | {
+		@blockworld (east(), _); REST;
+	}
+	@blockworld( east(), _); REST; <- true | {
+		@blockworld (south(), _); REST;
+	}
+	@blockworld( south(), _); REST; <- true | {
+		@blockworld (west(), _); REST;
+	}
+	@blockworld( west(), _); REST; <- true | {
+		@blockworld( north(), _) ; REST;
+	}
+
