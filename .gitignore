@@ -12,3 +12,7 @@ MTPs-Main-Container.txt
 #InteliJ
 multi-agent-systems.iml
 .idea
+
+#archives
+*.jar
+*.zip
