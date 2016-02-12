@@ -18,9 +18,12 @@ programming skill: Hardware , Verilog (10 years), Software, C/C++ (2 months), no
  Amsterdam. I don't have a lot programming experience, but I'm spending a
  lot of free time at it at the moment (Java) because I want to learn it.
 
-email: b.e.zijlstra@students.uu.nl
+
+* email: b.e.zijlstra@students.uu.nl
+* id: 5774284
 
 # Yunlu Chen
 bachelor in physics. Limited experience with C++, java, R
 
-email: y.chen@students.uu.nl
+* email: y.chen@students.uu.nl
+* id: 5684218
