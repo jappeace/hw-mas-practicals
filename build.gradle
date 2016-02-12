@@ -29,4 +29,6 @@ dependencies {
 	compile "org.slf4j:slf4j-simple:1.7.13"
 
 	compile "com.tilab.jade:jade:4.4.0"
+	compile "com.tilab.jade:jade-misc:2.7.0"
+	compile "com.tilab.jade:jade-wsdc:2.7.0"
 }
