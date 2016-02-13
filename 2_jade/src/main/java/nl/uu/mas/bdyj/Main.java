@@ -1,13 +1,9 @@
 package nl.uu.mas.bdyj;
 
-import examples.bookTrading.BookSellerAgent;
 import jade.Boot;
 import jade.core.Agent;
-import jade.domain.JADEAgentManagement.CreateAgent;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-
-import java.util.Random;
 
 class Main{
 	private static final Logger log = LoggerFactory.getLogger(Main.class);
