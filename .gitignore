@@ -10,7 +10,7 @@ APDescription.txt
 MTPs-Main-Container.txt
 
 #InteliJ
-multi-agent-systems.iml
+*.iml
 .idea
 
 #archives
