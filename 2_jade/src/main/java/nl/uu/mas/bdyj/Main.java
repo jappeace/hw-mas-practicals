@@ -1,8 +1,6 @@
 package nl.uu.mas.bdyj;
 
 import examples.bookTrading.BookSellerAgent;
-import examples.bookTrading.BookSellerGui;
-import examples.jess.BasicJessBehaviour;
 import jade.Boot;
 import jade.core.Agent;
 import jade.domain.JADEAgentManagement.CreateAgent;
@@ -22,7 +20,7 @@ class Main{
 				log.info("agent reporting");
 			}
 		};
-		Boot.main(new String[]{"-gui -local-port 1100 jade.Boot;buyer1:examples.bookTrading.BookBuyerAgent(book1,book2,book3);seller1:examples.bookTrading.BookSellerAgent(book2,book3,book4)"});
+		Boot.main("-gui -local-port 1100 jade.Boot;buyer1:examples.bookTrading.BookBuyerAgent(book1,book2,book3);seller1:examples.bookTrading.BookSellerAgent(book2,book3,book4)".split(" "));
 
 	}
 
