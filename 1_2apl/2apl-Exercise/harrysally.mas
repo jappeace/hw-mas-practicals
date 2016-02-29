@@ -5,5 +5,6 @@
     <parameter key="entities" value="2"/>
   </environment>
   <agent name="harry" file="harry.2apl"/>
+  <agent name="bert" file="bert.2apl"/>
   <agent name="sally" file="sally.2apl"/>
 </apaplmas>
