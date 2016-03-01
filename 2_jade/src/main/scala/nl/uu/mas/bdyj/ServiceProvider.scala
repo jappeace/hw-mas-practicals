@@ -1,14 +1,12 @@
 package nl.uu.mas.bdyj
 
-import jade.core.{Agent, BaseService}
-import nl.uu.mas.bdyj.ServiceProvider.{HairDresser, ServiceType}
+import jade.core.{Agent}
+import nl.uu.mas.bdyj.ServiceProvider.{Dentist, HairDresser, ServiceType}
 
 
-class ServiceProvider(offeredService:ServiceType) extends BaseService{
-	override def getName: String = offeredService.getClass.getSimpleName
-}
+class ServiceProvider(service:ServiceType) extends Agent{}
 object ServiceProvider{
 	sealed trait ServiceType{}
 	case object HairDresser extends ServiceType{}
-	case object Dentist extends ServiceType
+	case object Dentist extends ServiceType{}
 }

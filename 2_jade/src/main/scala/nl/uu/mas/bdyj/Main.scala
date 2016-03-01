@@ -5,18 +5,42 @@ import jade.core.Agent
 import org.slf4j.LoggerFactory
 import org.slf4j.Logger
 
+import scala.util.Random
+
 object Main {
 	private val log: Logger = LoggerFactory.getLogger("Main")
 
 	def main(args: Array[String]) {
 		log.info("the JADI returns!")
-		val a: Agent = new Agent() {
-			protected override def setup {
-				super.setup
-				log.info("agent reporting")
+
+		val args = s"-gui -local-port ${(Random.nextFloat()*10000).toInt}".split(" ")
+		import jade.core.ProfileImpl
+		import jade.core.Runtime
+		import jade.util.leap.Properties
+		val iae:ProfileImpl  = if(args.nonEmpty) {
+			if(args(0).startsWith("-")) {
+				val pp:Properties  = Boot.parseCmdLineArgs(args)
+				if(pp == null) {
+					return
+				}
+				new ProfileImpl(pp)
+			} else {
+				new ProfileImpl(args(0))
 			}
+		} else {
+			new ProfileImpl("leap.properties")
 		}
-		Boot.main("-gui -local-port 1100 jade.Boot;buyer1:examples.bookTrading.BookBuyerAgent(book1,book2,book3);seller1:examples.bookTrading.BookSellerAgent(book2,book3,book4)".split(" "))
-		new ServiceProvider(ServiceProvider.Dentist)
+
+		val inst = Runtime.instance()
+		inst.setCloseVM(true)
+
+		val container = if(iae.getBooleanProperty("main", true)) {
+			inst.createMainContainer(iae)
+		} else {
+			inst.createAgentContainer(iae)
+		}
+		container.acceptNewAgent("dentist", new ServiceProvider(ServiceProvider.Dentist))
+		container.acceptNewAgent("hairdresser", new ServiceProvider(ServiceProvider.HairDresser))
+		container.acceptNewAgent("initbaby", new Initializer)
 	}
 }
