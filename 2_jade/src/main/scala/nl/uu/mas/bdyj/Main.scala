@@ -2,6 +2,7 @@ package nl.uu.mas.bdyj
 
 import jade.Boot
 import jade.core.Agent
+import nl.uu.mas.bdyj.agents.{ServiceProvider, Initializer}
 import org.slf4j.LoggerFactory
 import org.slf4j.Logger
 
@@ -39,8 +40,9 @@ object Main {
 		} else {
 			inst.createAgentContainer(iae)
 		}
-		container.acceptNewAgent("dentist", new ServiceProvider(ServiceProvider.Dentist))
-		container.acceptNewAgent("hairdresser", new ServiceProvider(ServiceProvider.HairDresser))
-		container.acceptNewAgent("initbaby", new Initializer)
+		import ServiceProvider._
+		container.acceptNewAgent("John", new ServiceProvider(Dentist)).start()
+		container.acceptNewAgent("Paul", new ServiceProvider(HairDresser)).start()
+		container.acceptNewAgent("Breeder", new Initializer).start()
 	}
 }
