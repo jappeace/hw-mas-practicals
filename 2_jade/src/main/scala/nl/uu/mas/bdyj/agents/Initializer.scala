@@ -17,7 +17,6 @@ class SpawnBehavior(agent: Agent, timeInMS:Long) extends TickerBehaviour(agent,t
 	var agentCount = 0
 	val arguments = Array[AnyRef]()
 	override def onTick(): Unit = {
-		println("tick")
 		val newName = s"client-$agentCount"
 		log.info(s"creating $newName")
 		val possibleServices = Seq(ServiceProvider.Dentist, ServiceProvider.HairDresser)
