@@ -67,8 +67,7 @@ pcrules:
   	    B((abs(X - X1)) = DIST_X);
   	    B((abs(Y - Y1)) = DIST_Y);
   	    B((DIST_X + DIST_Y) = DIST);
-  	    if (DIST < MIN) then 
-  	    {
+  	    if (DIST < MIN) then {
   	        -trap(X_P,Y_P);
   	    	%B(is(MIN_NEW,DIST));
   	    	%B(is(X_MIN,X1));
@@ -77,15 +76,15 @@ pcrules:
   	    	B(X1 = X_MIN);
   	    	B(Y1 = Y_MIN);
   	    	+trap(X_MIN,Y_MIN);
-  	    	calc_nearest_bin(REST,X,Y,MIN_NEW,X_MIN,Y_MIN);
   	    }
   	    else {
   	    	B(is(MIN_NEW,MIN));
   	    	B(is(X_MIN,X_P));
   	    	B(is(Y_MIN,Y_P));
-  	        calc_nearest_bin(REST,X,Y,MIN_NEW,X_MIN,Y_MIN);
   	    }
+		calc_nearest_bin(REST,X,Y,MIN_NEW,X_MIN,Y_MIN);
   	}
+	B("pizza");
   }
 	
   startup(X,Y,C) <- true |
