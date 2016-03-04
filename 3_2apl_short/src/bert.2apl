@@ -1,4 +1,0 @@
-include: contester.2apl;
-
-plans:
-  startup(0, 5, yellow);
