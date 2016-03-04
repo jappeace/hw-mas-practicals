@@ -1,0 +1,72 @@
+include: person.2apl;
+
+beliefs:
+  clean( blockWorld ) :- not bomb(X,Y) , not carry(bomb).
+  score(0).
+  findtrap( blockWorld ) :- trap(X, Y).
+  followSally( blockWorld ) :- bomb(X, Y).
+
+beliefupdates:
+  { carry(bomb) }     Drop()   { not carry(bomb)}
+  { not carry(bomb) and score(N) } PickUp() { carry(bomb), score(N + 1), not score(N)}
+
+goals:
+  clean( blockWorld ).
+  findtrap ( blockWorld ).
+  followSally( blockWorld ).
+  idle( blockWorld ).
+
+pgrules:
+  clean( blockWorld ) <- findtrap(blockWorld) and bomb(X, Y) and trap(Q, Z)|
+  {
+    goto( X, Y );
+    @blockworld( pickup( ), _ );
+	PickUp();
+	-bomb( X, Y );
+
+    goto(Q, Z);
+	@blockworld( drop( ), _ );
+	Drop();
+
+  }
+  idle( blockWorld ) <- clean( blockWorld ) and (not followSally( blockWorld )) |
+  {
+  	adopta( followSally( blockWorld ));
+  }
+  followSally( blockWorld ) <- findtrap( blockWorld ) and (not bomb(X,Y) and (not carry(bomb)) )|
+  {
+    @blockworld( senseAllAgent(), AGENTS);
+	if B(select([sally, X, Y], AGENTS, Q)){
+		goto( X, Y );
+	}
+  }
+  findtrap( blockWorld ) <- worldSize(W, H) |
+  {
+    B(is( X, int( random( W - 1 ) ) ));
+    B(is( Y, int( random( H - 1 ) ) ));
+    goto( X, Y );
+    @blockworld( senseTraps(), TRAPS);
+    if B( TRAPS = [[default,X1,Y1]|REST] )
+    {
+		+trap(X1, Y1);
+    }
+  }
+
+pcrules:
+  message( sally, inform, La, On, bombAt( X, Y ) ) <- true |
+  {
+    if B( not bomb( A, B ) ) {
+      +bomb(X, Y);
+      adopta( clean( blockWorld ) );
+    }
+    else {
+		+bomb( X, Y );
+	}
+  }
+prrules:
+  @blockworld( pickup(), _ ); REST; <- true |
+  {
+    @blockworld( sensePosition(), POS );
+    B(POS = [X,Y]);
+    -bomb(X, Y );
+  }

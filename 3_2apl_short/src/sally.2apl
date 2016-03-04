@@ -1,0 +1,20 @@
+include: person.2apl;
+
+goals:
+  search( blockWorld ).
+
+plans:
+  startup(8, 8, red);
+
+pgrules:
+  search( blockWorld ) <- worldSize(W,H) |
+  {
+    B(is( X, int( random( W - 1 ) ) ));
+    B(is( Y, int( random( H - 1 ) ) ));
+    goto( X, Y );
+    @blockworld( senseBombs(), BOMBS );
+    if B( BOMBS = [[default,X1,Y1]|REST] )
+    {
+      send( harry, inform, bombAt( X1, Y1 ) );
+    }
+  }
