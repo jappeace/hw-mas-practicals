@@ -1,0 +1,115 @@
+include: person.2apl;
+
+beliefs: 
+  clean( blockWorld ) :- not bomb(X,Y) , not carry(bomb).
+  score_X(0).
+  it(0).
+  sp(0,0).
+  
+  knowtrap :- trap(X,Y).
+%  trap(4,5).
+
+
+beliefupdates:
+  { carry(bomb), score_X(M) }    Drop()   { not carry(bomb), not score_X(M), score_X(M+1)}
+  { not carry(bomb) } PickUp() { carry(bomb) }
+
+
+plans:
+  startup(0, 1, blue);
+
+goals:
+  knowtrap.
+  follow.
+
+pgrules:
+
+follow <- knowtrap and clean( blockWorld ) |
+{	
+	% when enter into follow status, if I didn't send a idle message to hally, 
+        % then, send a message to hally to inform her that I'm idle now
+	B(is(STA,1));
+	if B(not sent_idle) {
+	    send( hally, inform, status(STA));
+	}
+	+sent_idle;
+	
+	@blockworld(senseAllAgent(),AGENTS);
+  	if B( AGENTS = [[barry3,X1,Y1] , [hally,X2,Y2] | REST ]) {
+  		+following;
+  		f_goto(X2,Y2);
+  		-following;
+  	}
+}
+
+  clean( blockWorld ) <- bomb( X, Y ) and trap(X1,Y1) and not following|
+  {
+    	%dropgoal( follow( blockWorld ));
+	% send a message to inform hally that I'm busy
+	B(is(STA,0));
+	send( hally, inform, status(STA));
+	-sent_idle;
+    	B(is(N,0));
+        goto(X, Y, N);
+    	@blockworld( pickup( ), _ );
+    	PickUp();
+	-bomb( X, Y );
+	@blockworld( senseAllTraps(), TRAPS );
+    	if B( TRAPS = [[default,X2,Y2] | REST]) {
+      	    -trap(X1,Y1);
+      	    +trap(X2,Y2);
+      	}
+	%@blockworld( senseAllTraps(), TRAPS );
+	%calc_nearest_bin(TRAPS,X,Y,100,X1,Y1);
+	B(is(N,0));
+    	goto(X1, Y1, N);
+	@blockworld( drop( ), _ );
+	Drop();
+	%adopta( follow( blockWorld ));
+  }
+  
+  knowtrap <- worldSize(W,H) |
+  {
+    @blockworld( senseAllTraps(), TRAPS );
+    if B( TRAPS = [[default,X1,Y1] | REST]) {
+      %calc_nearest_bin(TRAPS,0,0,100,0,0);
+      +trap(X1,Y1);
+      +knowtrap_done;
+      adopta( clean( blockWorld));
+      dropgoal(knowtrap);
+      }
+  }
+  
+ % follow( blockWorld ) <- trap(X1,Y1) |
+ % {
+ % 	if B(not bomb(X,Y) and not carry(bomb)) {
+ % 		%dropgoal( clean( blockWorld ));
+ % 		@blockworld(senseAllAgent(),AGENTS);
+ % 		if B( AGENTS = [[sally,X2,Y2] | REST]) {
+ % 			goto(X2,Y2);
+ % 			+sp(X2,Y2);
+ % 		%	adopta( clean( blockWorld));
+%		}		
+%	}
+%}
+
+pcrules:
+  message( hally, inform, La, On, bombAt( X, Y ) ) <- true |
+  {   
+    if B( not bomb( A, B ) ) {
+      +bomb(X, Y);
+      adoptz( clean( blockWorld ) );
+    }
+    else { 
+	+bomb( X, Y );
+    }
+  }
+  
+
+prrules:
+  @blockworld( pickup(), _ ); REST; <- true |
+  {
+    @blockworld( sensePosition(), POS );
+    B(POS = [X,Y]);
+    -bomb(X, Y );
+  }

@@ -1,0 +1,153 @@
+
+pcrules:
+  goto( X, Y, N) <- true |
+  {
+    @blockworld( sensePosition(), POS );
+    B(POS = [A,B]);
+    B(is(M,N+1));
+    % if the agent finds that the goal is too hard to achieve after many attempts 
+    % then he can drop the goal
+    if (M > 32) {
+    	+drop_goto_goal(X,Y);
+    }
+    else if (A > X) then { 
+	@blockworld( west(), _ );
+      	goto( X, Y, M);
+    }
+    else if (A < X) then
+    { 
+	@blockworld( east(), _ );
+      	goto( X, Y, M);
+    }
+    else if (B > Y) then
+    { 
+	@blockworld( north(), _ );
+      	goto( X, Y, M);
+    }
+    else if (B < Y) then
+    { 
+	@blockworld( south(), _ );
+      	goto( X, Y, M);
+    }
+  }
+  
+  f_goto( X, Y ) <- true |
+  {
+    @blockworld( sensePosition(), POS );
+    B(POS = [A,B]);
+    if (A > X) then
+    { 
+		  @blockworld( west(), _ );
+      %goto( X, Y );
+    }
+    else if (A < X) then
+    { 
+		  @blockworld( east(), _ );
+      %goto( X, Y );
+    }
+    else if (B > Y) then
+    { 
+		  @blockworld( north(), _ );
+      %goto( X, Y );
+    }
+    else if (B < Y) then
+    { 
+		  @blockworld( south(), _ );
+      %goto( X, Y );
+    }
+  }
+  
+  calc_nearest_bin(TRAPS,X,Y,MIN,X_P,Y_P) <- true | {
+      if B(TRAPS = [[default,X1,Y1] | REST]) then {
+          % calulate the distance between the location of barry2 and the bomb
+  	    %B(is(DIST_X , abs(X - X1)));
+  	    %B(is(DIST_Y , abs(Y - Y1)));
+  	    %B(is(DIST , (DIST_X + DIST_Y)));
+
+  	    B((abs(X - X1)) = DIST_X);
+  	    B((abs(Y - Y1)) = DIST_Y);
+  	    B((DIST_X + DIST_Y) = DIST);
+  	    if (DIST < MIN) then 
+  	    {
+  	        -trap(X_P,Y_P);
+  	    	%B(is(MIN_NEW,DIST));
+  	    	%B(is(X_MIN,X1));
+  	    	%B(is(Y_MIN,Y1));
+  	    	B(DIST = MIN_NEW);
+  	    	B(X1 = X_MIN);
+  	    	B(Y1 = Y_MIN);
+  	    	+trap(X_MIN,Y_MIN);
+  	    	calc_nearest_bin(REST,X,Y,MIN_NEW,X_MIN,Y_MIN);
+  	    }
+  	    else {
+  	    	B(is(MIN_NEW,MIN));
+  	    	B(is(X_MIN,X_P));
+  	    	B(is(Y_MIN,Y_P));
+  	        calc_nearest_bin(REST,X,Y,MIN_NEW,X_MIN,Y_MIN);
+  	    }
+  	}
+  }
+	
+  startup(X,Y,C) <- true |
+  {
+    @blockworld( enter(X, Y, C), _);
+		
+    @blockworld( getWorldSize(), WS);
+    B(WS = [Width,Height]);
+		+worldSize(Width, Height);
+		
+    @blockworld( getSenseRange(), SR );
+		B(SR = [S]);		
+    +senseRange(S);
+  }
+	
+prrules:
+	@blockworld( north(), _); REST1; <- true | {
+		@blockworld( sensePosition(), POS );
+    		B(POS = [A,B]);
+    		if B(B = 0) {
+    		    goto(8,8,0);
+    		}
+    		else { 
+		    @blockworld (east(), _); 
+		    @blockworld (north(), _);
+		}
+		REST1;
+	}
+	@blockworld( east(), _); REST2; <- true | {
+		@blockworld( sensePosition(), POS );
+    		B(POS = [A,B]);
+    		if B(A = (W - 1)) {
+    		    goto(8,8,0);
+    		}
+    		else { 
+		    @blockworld (south(), _); 
+		    @blockworld (east(), _);
+		}
+		REST2;
+	}
+	@blockworld( south(), _); REST3; <- true | {
+		@blockworld( sensePosition(), POS );
+    		B(POS = [A,B]);
+    		if B(B = (H - 1)) {
+    		    goto(8,8,0);
+    		}
+    		else {
+		    @blockworld (west(), _); 
+		    @blockworld (south(), _);
+		}
+		REST3;
+	}
+	@blockworld( west(), _); REST4; <- true | {
+		@blockworld( sensePosition(), POS );
+    		B(POS = [A,B]);
+    		if B(A = 0) {
+    		    goto(8,8,0);
+    		}
+    		else {
+		    @blockworld (north(), _); 
+		    @blockworld (west(), _);
+		}
+		REST4;
+	}
+

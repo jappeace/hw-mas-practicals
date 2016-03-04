@@ -1,0 +1,94 @@
+pcrules:
+  goto( X, Y, N) <- true |
+  {
+    @blockworld( sensePosition(), POS );
+    B(POS = [A,B]);
+    B(is(M,N+1));
+    % if the agent finds that the goal is too hard to achieve after many attempts 
+    % then he can drop the goal
+    if (M > 32) {
+    +drop_goto_goal(X,Y);
+    }
+    else if (A > X) then { 
+	@blockworld( west(), _ );
+      	goto( X, Y, M);
+    }
+    else if (A < X) then
+    { 
+	@blockworld( east(), _ );
+      	goto( X, Y, M);
+    }
+    else if (B > Y) then
+    { 
+	@blockworld( north(), _ );
+      	goto( X, Y, M);
+    }
+    else if (B < Y) then
+    { 
+	@blockworld( south(), _ );
+      	goto( X, Y, M);
+    }
+  }
+  
+  f_goto( X, Y ) <- true |
+  {
+    @blockworld( sensePosition(), POS );
+    B(POS = [A,B]);
+    if (A > X) then
+    { 
+		  @blockworld( west(), _ );
+      %goto( X, Y );
+    }
+    else if (A < X) then
+    { 
+		  @blockworld( east(), _ );
+      %goto( X, Y );
+    }
+    else if (B > Y) then
+    { 
+		  @blockworld( north(), _ );
+      %goto( X, Y );
+    }
+    else if (B < Y) then
+    { 
+		  @blockworld( south(), _ );
+      %goto( X, Y );
+    }
+  }
+ 
+	
+  startup(X,Y,C) <- true |
+  {
+    @blockworld( enter(X, Y, C), _);
+		
+    @blockworld( getWorldSize(), WS);
+    B(WS = [Width,Height]);
+		+worldSize(Width, Height);
+		
+    @blockworld( getSenseRange(), SR );
+		B(SR = [S]);		
+    +senseRange(S);
+  }
+	
+prrules:
+	@blockworld( north(), _); REST; <- true | {
+		@blockworld (east(), _); 
+		@blockworld (north(), _);
+		REST;
+	}
+	@blockworld( east(), _); REST; <- true | {
+		@blockworld (south(), _); 
+		@blockworld (east(), _);
+		REST;
+	}
+	@blockworld( south(), _); REST; <- true | {
+		@blockworld (west(), _); 
+		@blockworld (south(), _);
+		REST;
+	}
+	@blockworld( west(), _); REST; <- true | {
+		@blockworld (north(), _); 
+		@blockworld (west(), _);
+		REST;
+	}
+

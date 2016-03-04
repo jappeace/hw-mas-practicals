@@ -1,0 +1,101 @@
+include: person.2apl;
+
+goals:
+  search( blockWorld ).
+
+plans:
+
+  startup(8, 8, red);
+  
+
+pgrules:
+  search( blockWorld ) <- worldSize(W,H) |
+  {
+    B(is( X, int( random( W - 1 ) ) ));
+    B(is( Y, int( random( H - 1 ) ) ));
+    B(is( N, 0));
+    hally_goto( X, Y, N);
+  }
+  
+pcrules:
+  message( barry2, inform, La, On, status(STA) ) <- true |
+  {   
+    if B(STA = 1) {
+    	+idle_barry2;
+    }
+    else if B(STA = 0) {
+        -idle_barry2;
+    }	
+  }
+  
+  message( barry3, inform, La, On, status(STA) ) <- true |
+  {   
+    if B(STA = 1) {
+    	+idle_barry3;
+    }
+    else if B(STA = 0) {
+        -idle_barry3;
+    }	
+  }
+  
+  hally_goto( X, Y, N) <- true |
+  {
+    @blockworld( senseBombs(), BOMBS );
+    if B( BOMBS = [[default,X1,Y1]|REST] )
+    { 
+      if (B(idle_barry2)) && (B(not idle_barry3)) {
+      	send( barry2, inform, bombAt( X1, Y1 ) );
+      }
+      else if (B(not idle_barry2)) && (B(idle_barry3)) {
+      	send( barry3, inform, bombAt( X1, Y1 ) );
+      }
+      else {
+        @blockworld(senseAllAgent(),AGENTS);
+  	if B( AGENTS = [[barry2,Xb2,Yb2] , [barry3,Xb3,Yb3] ]) {
+  	    % calulate the distance between the location of barry2 and the bomb
+  	    B(is(DIST2_X , abs(X1 - Xb2)));
+  	    B(is(DIST2_Y , abs(Y1 - Yb2)));
+  	    B(is(DIST2 , (DIST2_X + DIST2_Y)));
+  	    % calulate the distance between the location of barry3 and the bomb
+  	    B(is(DIST3_X , abs(X1 - Xb3)));
+  	    B(is(DIST3_Y , abs(Y1 - Yb3)));
+  	    B(is(DIST3 , (DIST3_X + DIST3_Y)));
+  	    % send the bomb location message to the agent who is the neariest to the bomb
+  	    if (DIST2 < DIST3) {
+  	    	send( barry2, inform, bombAt( X1, Y1 ) );
+  	    }
+  	    else {
+  	    	send( barry3, inform, bombAt( X1, Y1 ) );
+  	    }
+  	}
+      }
+    }
+    @blockworld( sensePosition(), POS );
+    B(POS = [A,B]);
+    B(is(M,N+1));
+    % if the agent finds that the goal is too hard to achieve after many attempts 
+    % then he can drop the goal
+    if (M > 32) {
+    	+drop_goto_goal(X,Y);
+    }
+    else if (A > X) then { 
+	@blockworld( west(), _ );
+      	hally_goto( X, Y, M);
+    }
+    else if (A < X) then
+    { 
+	@blockworld( east(), _ );
+      	hally_goto( X, Y, M);
+    }
+    else if (B > Y) then
+    { 
+	@blockworld( north(), _ );
+      	hally_goto( X, Y, M);
+    }
+    else if (B < Y) then
+    { 
+	@blockworld( south(), _ );
+      	hally_goto( X, Y, M);
+    }
+  }
+  

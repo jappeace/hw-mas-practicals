@@ -1,0 +1,98 @@
+include: person.2apl;
+
+beliefs: 
+  clean( blockWorld ) :- not bomb(X,Y) , not carry(bomb).
+  score_X(0).
+  it(0).
+  sp(0,0).
+  
+  knowtrap :- trap(X,Y).
+%  trap(4,5).
+
+
+beliefupdates:
+  { carry(bomb), score_X(M) }    Drop()   { not carry(bomb), not score_X(M), score_X(M+1)}
+  { not carry(bomb) } PickUp() { carry(bomb) }
+
+
+plans:
+  startup(0, 1, yellow);
+
+goals:
+  knowtrap.
+  follow.
+
+pgrules:
+
+follow <- knowtrap and clean( blockWorld ) |
+{
+	@blockworld(senseAllAgent(),AGENTS);
+  	if B( AGENTS = [[sally,X2,Y2] | REST]) {
+  		+following;
+  		f_goto(X2,Y2);
+  		-following;
+  	}
+}
+
+  clean( blockWorld ) <- bomb( X, Y ) and trap(X1,Y1) and not following|
+  {
+    	%dropgoal( follow( blockWorld ));
+    	B(is(N,0));
+        goto(X, Y, N);
+    	@blockworld( pickup( ), _ );
+    	PickUp();
+	-bomb( X, Y );
+	B(is(N,0));
+    	goto(X1, Y1, N);
+	@blockworld( drop( ), _ );
+	Drop();
+	%adopta( follow( blockWorld ));
+  }
+  
+  knowtrap <- worldSize(W,H) |
+  {
+    B(is( X, int( random( W - 1 ) ) ));
+    B(is( Y, int( random( H - 1 ) ) ));
+    B(is(N,0));
+    goto(X, Y, N);
+    @blockworld( senseTraps(), TRAPS );
+    if B( TRAPS = [[default,X1,Y1] | REST]) {
+      +trap(X1,Y1);
+      dropgoal(knowtrap);
+      adopta( clean( blockWorld));
+      }
+  }
+  
+ % follow( blockWorld ) <- trap(X1,Y1) |
+ % {
+ % 	if B(not bomb(X,Y) and not carry(bomb)) {
+ % 		%dropgoal( clean( blockWorld ));
+ % 		@blockworld(senseAllAgent(),AGENTS);
+ % 		if B( AGENTS = [[sally,X2,Y2] | REST]) {
+ % 			goto(X2,Y2);
+ % 			+sp(X2,Y2);
+ % 		%	adopta( clean( blockWorld));
+%		}		
+%	}
+%}
+
+pcrules:
+  message( Hally, inform, La, On, bombAt( X, Y ) ) <- true |
+  {   
+    if B( not bomb( A, B ) ) {
+      +bomb(X, Y);
+      adoptz( clean( blockWorld ) );
+    }
+    else { 
+			+bomb( X, Y );
+		}
+  }
+  
+
+prrules:
+  @blockworld( pickup(), _ ); REST; <- true |
+  {
+    @blockworld( sensePosition(), POS );
+    B(POS = [X,Y]);
+    -bomb(X, Y );
+  }
