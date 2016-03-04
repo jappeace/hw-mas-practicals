@@ -2,3 +2,6 @@ include: contester.2apl;
 
 plans:
   startup(0, 2, blue);
+
+beliefs:
+	identity(barry2).
