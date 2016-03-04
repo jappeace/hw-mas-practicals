@@ -42,7 +42,7 @@ follow <- knowtrap and clean( blockWorld ) |
   	}
 }
 
-  clean( blockWorld ) <- bomb( X, Y ) and trap(X1,Y1) and not following|
+  clean( blockWorld ) <- bomb( X, Y ) and trap(X1,Y1) and not following and not picked |
   {
     	%dropgoal( follow( blockWorld ));
 	% send a message to inform hally that I'm busy
@@ -54,26 +54,26 @@ follow <- knowtrap and clean( blockWorld ) |
     	@blockworld( pickup( ), _ );
     	PickUp();
 	-bomb( X, Y );
+	% detect the nearest trap
 	@blockworld( senseAllTraps(), TRAPS );
-    	if B( TRAPS = [[default,X2,Y2] | REST]) {
-      	    -trap(X1,Y1);
-      	    +trap(X2,Y2);
-      	}
-	%@blockworld( senseAllTraps(), TRAPS );
-	%calc_nearest_bin(TRAPS,X,Y,100,X1,Y1);
-	B(is(N,0));
+	det_nearest_bin(TRAPS,X,Y,100,X1,Y1);
+	adopta( clean_dropBomb( blockWorld ));
+	+picked;
+  }
+  
+  clean_dropBomb ( blockWorld ) <- picked and trap(X1,Y1) | {
+  	B(is(N,0));
     	goto(X1, Y1, N);
 	@blockworld( drop( ), _ );
 	Drop();
-	%adopta( follow( blockWorld ));
+	-picked;
   }
   
   knowtrap <- worldSize(W,H) |
   {
     @blockworld( senseAllTraps(), TRAPS );
     if B( TRAPS = [[default,X1,Y1] | REST]) {
-      %calc_nearest_bin(TRAPS,0,0,100,0,0);
-      +trap(X1,Y1);
+      det_nearest_bin(TRAPS,8,8,100,0,0);
       +knowtrap_done;
       adopta( clean( blockWorld));
       dropgoal(knowtrap);
