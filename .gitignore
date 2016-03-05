@@ -4,6 +4,8 @@
 # ignore vim files
 *.swp
 *.swo
+#vimdiff
+*.orig
 
 #JADE generated
 APDescription.txt

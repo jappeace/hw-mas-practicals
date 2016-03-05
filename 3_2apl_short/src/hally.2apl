@@ -51,7 +51,7 @@ pcrules:
       }
       else {
         @blockworld(senseAllAgent(),AGENTS);
-  	if B( AGENTS = [[barry2,Xb2,Yb2] , [barry3,Xb3,Yb3] ]) {
+  	if B( AGENTS = [[barry2,Xb2,Yb2] , [barry3,Xb3,Yb3]]) {
   	    % calulate the distance between the location of barry2 and the bomb
   	    B(is(DIST2_X , abs(X1 - Xb2)));
   	    B(is(DIST2_Y , abs(Y1 - Yb2)));
