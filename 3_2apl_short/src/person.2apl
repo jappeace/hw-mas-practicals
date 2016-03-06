@@ -79,14 +79,6 @@ pcrules:
   	    }
   	    % recur all traps
   	    det_nearest_bin(REST_TRAPS,X,Y,MIN_NEW,X_MIN,Y_MIN);
-  	    }
-  	    else {
-  	    	B(is(MIN_NEW,MIN));
-  	    	B(is(X_MIN,X_P));
-  	    	B(is(Y_MIN,Y_P));
-  	    }
-  	    % recur all traps
-  	    det_nearest_bin(REST_TRAPS,X,Y,MIN_NEW,X_MIN,Y_MIN);
   	}
   	else {
   	    +trap(X_P,Y_P);
