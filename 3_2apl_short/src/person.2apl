@@ -83,10 +83,10 @@ pcrules:
   	else {
   	    +trap(X_P,Y_P);
   	}
-	B("pizza");
   }
 	
   startup(X,Y,C) <- true |
+
   {
     @blockworld( enter(X, Y, C), _);
 		
