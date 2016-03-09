@@ -4,4 +4,4 @@ plans:
   startup(0, 2, blue);
 
 beliefs:
-	identity(barry2).
+	identity(barry1).
