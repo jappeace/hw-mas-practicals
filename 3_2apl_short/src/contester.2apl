@@ -22,24 +22,6 @@ goals:
 
 pgrules:
 
-follow <- knowtrap and clean( blockWorld ) |
-{	
-	% when enter into follow status, if I didn't send a idle message to hally, 
-        % then, send a message to hally to inform her that I'm idle now
-	B(is(STA,1));
-	if B(not sent_idle) {
-	    send( hally, inform, status(STA));
-	}
-	+sent_idle;
-	
-	@blockworld(senseAllAgent(),AGENTS);
-  	if B( AGENTS = [[barry3,X1,Y1] , [hally,X2,Y2] | REST ]) {
-  		+following;
-  		f_goto(X2,Y2);
-  		-following;
-  	}
-}
-
   clean( blockWorld ) <- bomb( X, Y ) and trap(X1,Y1) and not following and not picked |
   {
     	%dropgoal( follow( blockWorld ));
@@ -52,6 +34,7 @@ follow <- knowtrap and clean( blockWorld ) |
     	@blockworld( pickup( ), _ );
     	PickUp();
 	-bomb( X, Y );
+	send( hally, inform, bombPicked(X,Y));%send hally to eliminate the bomb from list
 	% detect the nearest trap
 	@blockworld( senseAllTraps(), TRAPS );
 	det_nearest_bin(TRAPS,X,Y,100,X1,Y1);
