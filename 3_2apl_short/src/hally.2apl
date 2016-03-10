@@ -82,13 +82,13 @@ pcrules:
 		  % send the bomb location message to the agent who is the neariest to the bomb
 		  if (DIST2 < DIST3) {
 		    +bomb2(X1,Y1);
-			%BOMBS2 = [BOMBS2|[X1,Y1]];
+			%B(is(BOMBS2 = [BOMBS2|[X1,Y1]]));
 			send( barry2, inform, bombAt( X1, Y1 ) );
 		  }
 		  else {
 			send( barry3, inform, bombAt( X1, Y1 ) );
 			+bomb3(X1,Y1);
-			%BOMBS3 = [BOMBS3|[X1,Y1]];
+			%B(is(BOMBS2 = [BOMBS2|[X1,Y1]]));
 		  }  	     
         }
 	  }
@@ -105,9 +105,9 @@ pcrules:
 	%%%%%%
 	sense_bomb(BOMBS);
 	%send( barry2, inform, bomblist(BOMBS2));
-	%BOMBS2=[];
+	%B(is(BOMBS2=[]));
 	%send( barry3, inform, bomblist(BOMBS3));
-	%BOMBS3=[];
+	%B(is(BOMBS3=[]));
 	%%%%%%%
 	
     % if B( BOMBS = [[default,X1,Y1]|REST] )
@@ -137,7 +137,7 @@ pcrules:
   	    	% send( barry3, inform, bombAt( X1, Y1 ) );
   	    % }
   	% }
-    }
+    %}
     % }
     @blockworld( sensePosition(), POS );
     B(POS = [A,B]);
