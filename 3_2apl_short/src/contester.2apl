@@ -122,6 +122,7 @@ pcrules:
   message( hally, inform, La, On, bomblist(BOMBS2) ) <- true |
   {   
     add_bomb(BOMBS2);
+	adoptz(clean(blockWorld));
   }  
   
   add_bomb(BOMBS2) <- true | {
