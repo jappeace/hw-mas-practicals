@@ -83,16 +83,19 @@ pcrules:
 			+bombs2(BOMBS2_NEW);
 			-bombs2(BOMBS2);
 			%send( barry2, inform, bombAt( X1, Y1 ) );
+			  sense_bomb(REST_BOMBS,BOMBS2_NEW,BOMBS3);
 		  }
 		  else {
 			B(append([[default,X1,Y1]],BOMBS3,BOMBS3_NEW));
 			+bombs3(BOMBS3_NEW);
 			-bombs3(BOMBS3);	
             %send( barry3, inform, bombAt( X1, Y1 ) );			
+			  sense_bomb(REST_BOMBS,BOMBS2,BOMBS3_NEW);
 		  }  	     
         }
+	  }else{
+		  sense_bomb(REST_BOMBS,BOMBS2,BOMBS3);
 	  }
-	  sense_bomb(REST_BOMBS,BOMBS2_NEW,BOMBS3_NEW);
 	}
     
   }
