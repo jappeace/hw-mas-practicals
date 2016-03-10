@@ -56,49 +56,19 @@ pcrules:
       %goto( X, Y );
     }
   }
-  
-  det_nearest_bin(TRAPS,X,Y,MIN,X_P,Y_P) <- true | {
-      if B(TRAPS = [[default,X1,Y1] | REST_TRAPS]) then {
-            % calulate the distance between the location of barry2 and the bomb
-  	    B(is(DIST_X , abs(X - X1)));
-  	    B(is(DIST_Y , abs(Y - Y1)));
-  	    B(is(DIST , (DIST_X + DIST_Y)));
-	    % if the distance between the agent and current trap is less than the previous minimum
-            % then update the minimum with the new trap
-  	    if (DIST < MIN) then 
-  	    {   
-  	        -trap(X_P,Y_P);
-  	    	B(is(MIN_NEW,DIST));
-  	    	B(is(X_MIN,X1));
-  	    	B(is(Y_MIN,Y1));
-  	    }
-  	    else {
-  	    	B(is(MIN_NEW,MIN));
-  	    	B(is(X_MIN,X_P));
-  	    	B(is(Y_MIN,Y_P));
-  	    }
-  	    % recur all traps
-  	    det_nearest_bin(REST_TRAPS,X,Y,MIN_NEW,X_MIN,Y_MIN);
-  	}
-  	else {
-  	    +trap(X_P,Y_P);
-  	}
-  }
-	
   startup(X,Y,C) <- true |
 
   {
     @blockworld( enter(X, Y, C), _);
-		
     @blockworld( getWorldSize(), WS);
     B(WS = [Width,Height]);
 		+worldSize(Width, Height);
-		
+
     @blockworld( getSenseRange(), SR );
-		B(SR = [S]);		
+		B(SR = [S]);
     +senseRange(S);
   }
-	
+
 prrules:
 	@blockworld( north(), _); REST1; <- true | {
 		@blockworld( sensePosition(), POS );
@@ -106,8 +76,8 @@ prrules:
     		if B(B = 0) {
     		    goto(8,8,0);
     		}
-    		else { 
-		    @blockworld (east(), _); 
+    		else {
+		    @blockworld (east(), _);
 		    @blockworld (north(), _);
 		}
 		REST1;

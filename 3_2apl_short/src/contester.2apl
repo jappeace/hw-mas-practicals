@@ -22,24 +22,6 @@ goals:
 
 pgrules:
 
-follow <- knowtrap and clean( blockWorld ) |
-{	
-	% when enter into follow status, if I didn't send a idle message to hally, 
-        % then, send a message to hally to inform her that I'm idle now
-	B(is(STA,1));
-	if B(not sent_idle) {
-	    send( hally, inform, status(STA));
-	}
-	+sent_idle;
-	
-	@blockworld(senseAllAgent(),AGENTS);
-  	if B( AGENTS = [[barry3,X1,Y1] , [hally,X2,Y2] | REST ]) {
-  		+following;
-  		f_goto(X2,Y2);
-  		-following;
-  	}
-}
-
   clean( blockWorld ) <- bomb( X, Y ) and trap(X1,Y1) and not following and not picked |
   {
     	%dropgoal( follow( blockWorld ));
@@ -52,6 +34,7 @@ follow <- knowtrap and clean( blockWorld ) |
     	@blockworld( pickup( ), _ );
     	PickUp();
 	-bomb( X, Y );
+	send( hally, inform, bombPicked(X,Y));%send hally to eliminate the bomb from list
 	% detect the nearest trap
 	@blockworld( senseAllTraps(), TRAPS );
 	det_nearest_bin(TRAPS,X,Y,100,X1,Y1);
@@ -77,33 +60,77 @@ follow <- knowtrap and clean( blockWorld ) |
       dropgoal(knowtrap);
       }
   }
-  
- % follow( blockWorld ) <- trap(X1,Y1) |
- % {
- % 	if B(not bomb(X,Y) and not carry(bomb)) {
- % 		%dropgoal( clean( blockWorld ));
- % 		@blockworld(senseAllAgent(),AGENTS);
- % 		if B( AGENTS = [[sally,X2,Y2] | REST]) {
- % 			goto(X2,Y2);
- % 			+sp(X2,Y2);
- % 		%	adopta( clean( blockWorld));
-%		}		
-%	}
-%}
+
+	follow <- knowtrap and clean( blockWorld ) |
+	{	
+		% when enter into follow status, if I didn't send a idle message to 
+		% hally,
+			% then, send a message to hally to inform her that I'm idle now
+		B(is(STA,1));
+		if B(not sent_idle) {
+			send( hally, inform, status(STA));
+		}
+		+sent_idle;
+		
+		@blockworld(senseAllAgent(),AGENTS);
+		if B(member([hally,X2,Y2], AGENTS)) {
+			+following;
+			f_goto(X2,Y2);
+			-following;
+		}
+	}
 
 pcrules:
   message( hally, inform, La, On, bombAt( X, Y ) ) <- true |
-  {   
+  {
     if B( not bomb( A, B ) ) {
       +bomb(X, Y);
       adoptz( clean( blockWorld ) );
     }
-    else { 
+    else {
 	+bomb( X, Y );
     }
   }
+  det_nearest_bin(TRAPS,X,Y,MIN,X_P,Y_P) <- true | {
+      if B(TRAPS = [[default,X1,Y1] | REST_TRAPS]) then {
+            % calulate the distance between the location of barry2 and the bomb
+  	    B(is(DIST_X , abs(X - X1)));
+  	    B(is(DIST_Y , abs(Y - Y1)));
+  	    B(is(DIST , (DIST_X + DIST_Y)));
+	    % if the distance between the agent and current trap is less than
+		% the previous minimum
+            % then update the minimum with the new trap
+  	    if (DIST < MIN) then
+  	    {
+  	        -trap(X_P,Y_P);
+  	    	B(is(MIN_NEW,DIST));
+  	    	B(is(X_MIN,X1));
+  	    	B(is(Y_MIN,Y1));
+  	    }
+  	    else {
+  	    	B(is(MIN_NEW,MIN));
+  	    	B(is(X_MIN,X_P));
+  	    	B(is(Y_MIN,Y_P));
+  	    }
+  	    % recur all traps
+  	    det_nearest_bin(REST_TRAPS,X,Y,MIN_NEW,X_MIN,Y_MIN);
+  	}
+  	else {
+  	    +trap(X_P,Y_P);
+  	}
+  }
+  message( hally, inform, La, On, bomblist(BOMBS2) ) <- true |
+  {   
+    add_bomb(BOMBS2);
+	adoptz(clean(blockWorld));
+  }  
   
-
+  add_bomb(BOMBS2) <- true | {
+    if B(BOMBS2 = [[default,X1,Y1] | REST_BOMBS2]) then {
+		+bomb(X1,Y1);
+		add_bomb(REST_BOMBS2);
+	}
+  }
 prrules:
   @blockworld( pickup(), _ ); REST; <- true |
   {
