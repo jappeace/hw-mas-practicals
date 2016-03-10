@@ -61,10 +61,10 @@ pcrules:
   }
   
      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  sense_bomb(BOMBS)<- true |{
+  sense_bomb(BOMBS,BOMBS2,BOMBS3)<- true |{
 	if B( BOMBS = [[default,X1,Y1]|REST_BOMBS] )
     { 
-	  if (not bomb(X1,Y1)){
+	  if B(not bomb(X1,Y1)){
 		FindBomb();
 		+bomb(X1,Y1);
         @blockworld(senseAllAgent(),AGENTS);
@@ -79,34 +79,39 @@ pcrules:
 		  B(is(DIST3 , (DIST3_X + DIST3_Y)));
 		  % send the bomb location message to the agent who is the neariest to the bomb
 		  if (DIST2 < DIST3) {
-		    +bomb2(X1,Y1);
-			%B(is(BOMBS2 = [BOMBS2|[X1,Y1]]));
-			send( barry2, inform, bombAt( X1, Y1 ) );
+			B(append([[default,X1,Y1]],BOMBS2,BOMBS2_NEW));
+			+bombs2(BOMBS2_NEW);
+			-bombs2(BOMBS2);
+			%send( barry2, inform, bombAt( X1, Y1 ) );
 		  }
 		  else {
-			send( barry3, inform, bombAt( X1, Y1 ) );
-			+bomb3(X1,Y1);
-			%B(is(BOMBS2 = [BOMBS2|[X1,Y1]]));
+			B(append([[default,X1,Y1]],BOMBS3,BOMBS3_NEW));
+			+bombs3(BOMBS3_NEW);
+			-bombs3(BOMBS3);	
+            %send( barry3, inform, bombAt( X1, Y1 ) );			
 		  }  	     
         }
 	  }
-	  sense_bomb(REST_BOMBS);
+	  sense_bomb(REST_BOMBS,BOMBS2_NEW,BOMBS3_NEW);
 	}
     
   }
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
-  hally_goto( X, Y, N) <- true |
+  hally_goto(X,Y,N) <- true |
   {
     @blockworld( senseBombs(), BOMBS );
 	%%%%%%
-	sense_bomb(BOMBS);
-	%send( barry2, inform, bomblist(BOMBS2));
-	%B(is(BOMBS2=[]));
-	%send( barry3, inform, bomblist(BOMBS3));
-	%B(is(BOMBS3=[]));
-	%%%%%%%
+	sense_bomb(BOMBS,[],[]);
+	if B(bombs2(BOMBS2)) {
+	send( barry2, inform, bomblist(BOMBS2));
+	-bombs2(BOMBS2);
+	}
+	if B(bombs3(BOMBS3)) {
+	send( barry3, inform, bomblist(BOMBS3));
+	-bombs3(BOMBS3);
+	}
 	
     % if B( BOMBS = [[default,X1,Y1]|REST] )
     % { 
@@ -139,7 +144,7 @@ pcrules:
     % }
     @blockworld( sensePosition(), POS );
     B(POS = [A,B]);
-    B(is(M,N+1));
+    B(is(M,(N+1)));
     % if the agent finds that the goal is too hard to achieve after many attempts 
     % then he can drop the goal
     if (M > 32) {

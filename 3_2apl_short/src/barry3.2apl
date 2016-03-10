@@ -33,7 +33,7 @@ pcrules:
   }  
   
   add_bomb(BOMBS3) <- true | {
-    if B(BOMBS3 = [[X1,Y1] | REST_BOMBS3]) then {
+    if B(BOMBS3 = [[default,X1,Y1]| REST_BOMBS3]) then {
       +bomb(X1,Y1);
 	}
 	add_bomb(REST_BOMBS3);
