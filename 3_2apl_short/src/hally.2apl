@@ -103,7 +103,7 @@ pcrules:
   {
     @blockworld( senseBombs(), BOMBS );
 	%%%%%%
-	sense_bomb(BOMBS,[],[]);
+	sense_bomb(BOMBS,[[]],[[]]);
 	if B(bombs2(BOMBS2)) {
 	send( barry2, inform, bomblist(BOMBS2));
 	-bombs2(BOMBS2);
