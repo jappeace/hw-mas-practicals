@@ -77,32 +77,46 @@ follow <- knowtrap and clean( blockWorld ) |
       dropgoal(knowtrap);
       }
   }
-  
- % follow( blockWorld ) <- trap(X1,Y1) |
- % {
- % 	if B(not bomb(X,Y) and not carry(bomb)) {
- % 		%dropgoal( clean( blockWorld ));
- % 		@blockworld(senseAllAgent(),AGENTS);
- % 		if B( AGENTS = [[sally,X2,Y2] | REST]) {
- % 			goto(X2,Y2);
- % 			+sp(X2,Y2);
- % 		%	adopta( clean( blockWorld));
-%		}		
-%	}
-%}
 
 pcrules:
   message( hally, inform, La, On, bombAt( X, Y ) ) <- true |
-  {   
+  {
     if B( not bomb( A, B ) ) {
       +bomb(X, Y);
       adoptz( clean( blockWorld ) );
     }
-    else { 
+    else {
 	+bomb( X, Y );
     }
   }
-  
+  det_nearest_bin(TRAPS,X,Y,MIN,X_P,Y_P) <- true | {
+      if B(TRAPS = [[default,X1,Y1] | REST_TRAPS]) then {
+            % calulate the distance between the location of barry2 and the bomb
+  	    B(is(DIST_X , abs(X - X1)));
+  	    B(is(DIST_Y , abs(Y - Y1)));
+  	    B(is(DIST , (DIST_X + DIST_Y)));
+	    % if the distance between the agent and current trap is less than
+		% the previous minimum
+            % then update the minimum with the new trap
+  	    if (DIST < MIN) then
+  	    {
+  	        -trap(X_P,Y_P);
+  	    	B(is(MIN_NEW,DIST));
+  	    	B(is(X_MIN,X1));
+  	    	B(is(Y_MIN,Y1));
+  	    }
+  	    else {
+  	    	B(is(MIN_NEW,MIN));
+  	    	B(is(X_MIN,X_P));
+  	    	B(is(Y_MIN,Y_P));
+  	    }
+  	    % recur all traps
+  	    det_nearest_bin(REST_TRAPS,X,Y,MIN_NEW,X_MIN,Y_MIN);
+  	}
+  	else {
+  	    +trap(X_P,Y_P);
+  	}
+  }
 
 prrules:
   @blockworld( pickup(), _ ); REST; <- true |
