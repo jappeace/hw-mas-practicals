@@ -4,7 +4,6 @@ goals:
   search( blockWorld ).
 
 plans:
-
   startup(8, 8, red);
   
 beliefs: 
@@ -21,10 +20,10 @@ pgrules:
     B(is( N, 0));
     hally_goto( X, Y, N);
   }
-  
+
 pcrules:
   message( barry2, inform, La, On, status(STA) ) <- true |
-  {   
+  {
     if B(STA = 1) {
     	+idle_barry2;
     }
@@ -44,7 +43,7 @@ pcrules:
   }
   
   message( barry3, inform, La, On, status(STA) ) <- true |
-  {   
+  {
     if B(STA = 1) {
     	+idle_barry3;
     }
@@ -138,7 +137,7 @@ pcrules:
   	    	% send( barry3, inform, bombAt( X1, Y1 ) );
   	    % }
   	% }
-      % }
+    }
     % }
     @blockworld( sensePosition(), POS );
     B(POS = [A,B]);
@@ -168,4 +167,3 @@ pcrules:
       	hally_goto( X, Y, M);
     }
   }
-  

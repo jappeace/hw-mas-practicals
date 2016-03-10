@@ -14,4 +14,4 @@ https://www.youtube.com/watch?v=ZDR433b0HJY&feature=youtu.be&t=250
 
 Should fetch gradle and all dependencies (may take a while the first time)
 
-Bram was here on 19 feb
+Bram was here on 19 febhoi
