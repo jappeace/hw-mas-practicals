@@ -61,6 +61,25 @@ pgrules:
       }
   }
 
+	follow <- knowtrap and clean( blockWorld ) |
+	{	
+		% when enter into follow status, if I didn't send a idle message to 
+		% hally,
+			% then, send a message to hally to inform her that I'm idle now
+		B(is(STA,1));
+		if B(not sent_idle) {
+			send( hally, inform, status(STA));
+		}
+		+sent_idle;
+		
+		@blockworld(senseAllAgent(),AGENTS);
+		if B(member([hally,X2,Y2], AGENTS)) {
+			+following;
+			f_goto(X2,Y2);
+			-following;
+		}
+	}
+
 pcrules:
   message( hally, inform, La, On, bombAt( X, Y ) ) <- true |
   {
@@ -100,7 +119,17 @@ pcrules:
   	    +trap(X_P,Y_P);
   	}
   }
-
+  message( hally, inform, La, On, bomblist(BOMBS2) ) <- true |
+  {   
+    add_bomb(BOMBS2);
+  }  
+  
+  add_bomb(BOMBS2) <- true | {
+    if B(BOMBS2 = [[default,X1,Y1] | REST_BOMBS2]) then {
+      +bomb(X1,Y1);
+	}
+	add_bomb(REST_BOMBS2);
+  }
 prrules:
   @blockworld( pickup(), _ ); REST; <- true |
   {
