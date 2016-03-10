@@ -6,6 +6,9 @@ goals:
 plans:
   startup(8, 8, red);
 
+beliefs:
+knownbombs(bombs).
+
 pgrules:
   search( blockWorld ) <- worldSize(W,H) |
   {
@@ -36,9 +39,15 @@ pcrules:
 	}
   }
 
-  hally_goto( X, Y, N) <- true |
+  findDifference(D_BOMBS) <- knowbombs(K_BOMBS) | {
+  }
+  hally_goto( X, Y, N) <- knownbombs(K_BOMBS)|
   {
-    @blockworld( senseBombs(), BOMBS );
+    @blockworld( senseBombs(), BOMBS);
+	m2(K_BOMBS, BOMBS, ALL_BOMBS)
+	-knownbombs(K_BOMBS);
+	+knownbombs(ALL_BOMBS);
+
     if B( BOMBS = [[default,X1,Y1]|REST] )
     {
 		if (B(idle_barry2)) && (B(not idle_barry3)) {
@@ -50,11 +59,13 @@ pcrules:
 		else {
 			@blockworld(senseAllAgent(),AGENTS);
 				if B( AGENTS = [[barry2,Xb2,Yb2] , [barry3,Xb3,Yb3]]) {
-				% calulate the distance between the location of barry2 and the bomb
+				% calulate the distance between the location of barry2 and
+				% the bomb
 				B(is(DIST2_X , abs(X1 - Xb2)));
 				B(is(DIST2_Y , abs(Y1 - Yb2)));
 				B(is(DIST2 , (DIST2_X + DIST2_Y)));
-				% calulate the distance between the location of barry3 and the bomb
+				% calulate the distance between the location of barry3 and
+				% the bomb
 				B(is(DIST3_X , abs(X1 - Xb3)));
 				B(is(DIST3_Y , abs(Y1 - Yb3)));
 				B(is(DIST3 , (DIST3_X + DIST3_Y)));
