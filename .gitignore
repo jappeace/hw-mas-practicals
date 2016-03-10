@@ -69,3 +69,5 @@ local.properties
 .springBeans
 
 # Code Recommenders
+# ignore yunlu start file
+a.bat
