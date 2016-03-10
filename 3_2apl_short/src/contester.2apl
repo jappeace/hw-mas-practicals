@@ -126,9 +126,9 @@ pcrules:
   
   add_bomb(BOMBS2) <- true | {
     if B(BOMBS2 = [[default,X1,Y1] | REST_BOMBS2]) then {
-      +bomb(X1,Y1);
+		+bomb(X1,Y1);
+		add_bomb(REST_BOMBS2);
 	}
-	add_bomb(REST_BOMBS2);
   }
 prrules:
   @blockworld( pickup(), _ ); REST; <- true |
