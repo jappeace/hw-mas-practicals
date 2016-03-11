@@ -1,0 +1,2 @@
+beliefs:
+	include: components2.pl;
