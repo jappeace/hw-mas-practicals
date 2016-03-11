@@ -6,22 +6,22 @@ pcrules:
     if (A > X) then
     { 
 		  @blockworld( west(), _ );
-      goto( X, Y );
+		  goto(X,Y);
     }
     else if (A < X) then
     { 
 		  @blockworld( east(), _ );
-      goto( X, Y );
+		  goto(X,Y);
     }
     else if (B > Y) then
     { 
 		  @blockworld( north(), _ );
-      goto( X, Y );
+		  goto(X,Y);
     }
     else if (B < Y) then
     { 
 		  @blockworld( south(), _ );
-      goto( X, Y );
+		  goto(X,Y);
     }
   }
 	

@@ -14,7 +14,7 @@ pgrules:
     goto( X, Y );
     @blockworld( senseBombs(), BOMBS );
     if B( BOMBS = [[default,X1,Y1]|REST] )
-    { 
+    {
       send( harry, inform, bombAt( X1, Y1 ) );
     }
   }

@@ -4,6 +4,8 @@
 # ignore vim files
 *.swp
 *.swo
+#vimdiff
+*.orig
 
 #JADE generated
 APDescription.txt
@@ -67,3 +69,5 @@ local.properties
 .springBeans
 
 # Code Recommenders
+# ignore yunlu start file
+a.bat
