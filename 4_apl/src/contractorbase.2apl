@@ -1,0 +1,12 @@
+
+pcrules:
+ message( manager, inform, La, On, part(SPEC) ) <- true |
+ {
+ 	+msg(SPEC);
+	if B(SPEC = pc_case(BRAND,NAME,FAMILY,ATX,THREE,COLOR)) then {
+		+ok(BRAND);
+		if B(is(pc_case(BRAND,NAME,FAMILY,ATX,THREE,COLOR,pc_platform,89))) then {
+			+awesome;
+		}
+	}
+ }

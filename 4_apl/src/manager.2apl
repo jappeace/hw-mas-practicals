@@ -1,4 +1,33 @@
+%TODO: use pc's intead of compontents
 beliefs:
-	include: components1.pl;
-	include: components2.pl;
-	include: components3.pl;
+	wants([
+		pc_case( antec,
+			'Antec Cases SONATA Mid Tower Case',
+			'Mid Tower',
+			atx,
+			'380',
+			black
+		),
+		processor(
+			intel,
+			'Intel Celeron A',
+			2.0,
+			128
+		)
+	]).
+
+goals:
+	announce.
+
+pgrules:
+announce <- not announced and wants(PARTS) |
+{
+	if B(PARTS = [PART|REST]) then {
+		-wants(PARTS);
+		+wants(REST);
+		+announced;
+		send(contractor1, inform, part(PART));
+		send(contractor2, inform, part(PART));
+		send(contractor3, inform, part(PART));
+	}
+}
