@@ -1,2 +1,4 @@
 beliefs:
-	pie("bly").
+	include: components1.pl;
+	include: components2.pl;
+	include: components3.pl;
