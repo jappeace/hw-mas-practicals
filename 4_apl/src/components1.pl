@@ -46,14 +46,32 @@ beige,
 pc_platform,  
 108).
 
+pc_case(antec, 
+'Antec Performance II SX630II' ,
+'Mini Tower', 
+atx, 
+300,
+beige, 
+pc_platform,  
+98).
+
 pc_case(antec,  
 'Antec Performance II SX835II',
-'Tower', 
+'tower', 
 atx, 
 350,
 beige, 
 pc_platform,  
 125).
+
+pc_case(antec,  
+'Antec Performance II SX835II',
+'tower', 
+atx, 
+350,
+beige, 
+pc_platform,  
+135).
 
 pc_case(supermicro, 
 'SuperMicro SC822',
@@ -66,7 +84,7 @@ pc_platform,
 
 pc_case(supermicro, 
 'SuperMicro SC742',
-'Tower',
+'tower',
 no_atx,
 420,
 black, 
@@ -75,7 +93,7 @@ pc_platform,
 
 pc_case(enlight,    
 'Enlight Server 8902',
-'Tower',
+'tower',
 atx,
 300,
 beige, 

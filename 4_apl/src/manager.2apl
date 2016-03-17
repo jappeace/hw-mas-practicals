@@ -1,12 +1,14 @@
 %TODO: use pc's intead of compontents
 beliefs:
 	wants([
-		pc_case( antec,
-			'Antec Cases SONATA Mid Tower Case',
-			'Mid Tower',
+		pc_case(
+            unspec,
+            unspec,
+            'tower',
 			atx,
-			'380',
-			black
+            unspec,
+			beige,
+            unspec
 		),
 		processor(
 			intel,
@@ -22,12 +24,8 @@ goals:
 pgrules:
 announce <- not announced and wants(PARTS) |
 {
-	if B(PARTS = [PART|REST]) then {
-		-wants(PARTS);
-		+wants(REST);
-		+announced;
-		send(contractor1, inform, part(PART));
-		send(contractor2, inform, part(PART));
-		send(contractor3, inform, part(PART));
-	}
+	+announced;
+	send(contractor1, cfp, part(PARTS));
+	send(contractor2, cfp, part(PARTS));
+	send(contractor3, cfp, part(PARTS));
 }
