@@ -6,7 +6,7 @@ pcrules:
 	if B(SPEC = pc_case(BRAND,NAME,FAMILY,ATX,THREE,COLOR)) {
 
 		+ok(pc_case(BRAND,NAME,FAMILY,ATX,THREE,COLOR));
-		if B(pc_case(BRAND,NAME,FAMILY,ATX,THREE,COLOR,_,_)) {
+		if B(pc_case(BRAND,NAME,FAMILY,ATX,_,COLOR,_,_)) {
 			+awesome('really');
 		}else{
 			+meiyou;
