@@ -1,16 +1,72 @@
+beliefs:
+pc_case_mp(100000).
+pc_case_mpi(m,t,s,a,p,c,u,p).
+
+
+goals:
+    match().
+
+pgrules:
+    match() <- req_part(SPEC) and pc_case_mp(MIN_PRICE) and
+               pc_case_mpi(MANUF_M,TYPE_M,SHAPE_M,ATX_M,POWER_M,COL_M,SUITFOR_M,PRICE_M) | {
+	    if B(SPEC = [pc_case(MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR)|REST]) {
+		    +ok(pc_case(MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR));
+            if (B(not (MANUF = unspec))) {
+                B(MANUF = MANUF_R);
+                +pc_case_requery(MANUF_R);
+            }
+            if (B(not (TYPE = unspec))) {
+                B(TYPE = TYPE_R);
+                +pc_case_requery(TYPE_R);
+            }
+            if (B(not (SHAPE = unspec))) {
+                B(SHAPE = SHAPE_R);
+                +pc_case_requery(SHAPE_R);
+            }
+            if (B(not (ATX = unspec))) {
+                B(ATX = ATX_R);
+                +pc_case_requery(ATX_R);
+            }
+            if (B(not (POWER = unspec))) {
+                B(POWER = POWER_R);
+                +pc_case_requery(POWER_R);
+            }
+            if (B(not (COL = unspec))) {
+                B(COL = COL_R);
+                +pc_case_requery(COL_R);
+            }
+            if (B(not (SUITFOR = unspec))) {
+                B(SUITFOR = SUITFOR_R);
+                +pc_case_requery(SUITFOR_R);
+            }
+
+		    if B(pc_case(MANUF_R,TYPE_R,SHAPE_R,ATX_R,POWER_R,COL_R,SUITFOR_R,PRICE)) {
+                if (PRICE < MIN_PRICE) {
+                    -pc_case_mp(MIN_PRICE);
+                    +pc_case_mp(PRICE);
+                    -pc_case_mpi(MANUF_M,TYPE_M,SHAPE_M,ATX_M,POWER_M,COL_M,SUITFOR_M,PRICE_M);
+                    +pc_case_mpi(MANUF_R,TYPE_R,SHAPE_R,ATX_R,POWER_R,COL_R,SUITFOR_R,PRICE);
+                }
+                -pc_case(MANUF_R,TYPE_R,SHAPE_R,ATX_R,POWER_R,COL_R,SUITFOR_R,PRICE);
+                +found_pc_case;
+		    }
+            else {
+                if B(found_pc_case) {
+                  B(pc_case_mpi(MANUF_M,TYPE_M,SHAPE_M,ATX_M,POWER_M,COL_M,SUITFOR_M,PRICE_M) = PC_CASE_MPI);
+                  send(manager,propose,repart(PC_CASE_MPI));
+                }
+                else {
+		    	    +meiyou;
+                }
+                -req_part(SPEC);
+		    }
+        }
+        else {
+            +err;
+        }
+	}
 
 pcrules:
- message( manager, inform, La, On, part(SPEC) ) <- true |
- {
- 	+msg(SPEC);
-	if B(SPEC = pc_case(BRAND,NAME,FAMILY,ATX,THREE,COLOR)) {
-
-		+ok(pc_case(BRAND,NAME,FAMILY,ATX,THREE,COLOR));
-		if B(pc_case(BRAND,NAME,FAMILY,ATX,_,COLOR,_,_)) {
-			+awesome('really');
-		}else{
-			+meiyou;
-		}
-
-	}
- }
+    message( manager, cfp, La, On, part(SPEC) ) <- true | {
+ 	    +req_part(SPEC);
+    }
