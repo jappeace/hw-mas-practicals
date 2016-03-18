@@ -1,6 +1,6 @@
 beliefs:
-pc_case_mp(100000).
-pc_case_mpi(m,t,s,a,p,c,u,p).
+    pc_case_mp(100000).
+    pc_case_mpi(m,t,s,a,p,c,u,p).
 
 
 goals:
