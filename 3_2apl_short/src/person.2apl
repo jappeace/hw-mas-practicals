@@ -5,55 +5,51 @@ pcrules:
     @blockworld( sensePosition(), POS );
     B(POS = [A,B]);
     B(is(M,N+1));
-    % if the agent finds that the goal is too hard to achieve after many attempts 
+    % if the agent finds that the goal is too hard to achieve after many attempts
     % then he can drop the goal
     if (M > 32) {
     	+drop_goto_goal(X,Y);
     }
-    else if (A > X) then { 
+    else if (A > X) then {
 	@blockworld( west(), _ );
       	goto( X, Y, M);
     }
     else if (A < X) then
-    { 
+    {
 	@blockworld( east(), _ );
       	goto( X, Y, M);
     }
     else if (B > Y) then
-    { 
+    {
 	@blockworld( north(), _ );
       	goto( X, Y, M);
     }
     else if (B < Y) then
-    { 
+    {
 	@blockworld( south(), _ );
       	goto( X, Y, M);
     }
   }
-  
+
   f_goto( X, Y ) <- true |
   {
     @blockworld( sensePosition(), POS );
     B(POS = [A,B]);
     if (A > X) then
-    { 
-		  @blockworld( west(), _ );
-      %goto( X, Y );
+    {
+	  @blockworld( west(), _ );
     }
     else if (A < X) then
-    { 
-		  @blockworld( east(), _ );
-      %goto( X, Y );
+    {
+	  @blockworld( east(), _ );
     }
     else if (B > Y) then
-    { 
-		  @blockworld( north(), _ );
-      %goto( X, Y );
+    {
+	  @blockworld( north(), _ );
     }
     else if (B < Y) then
-    { 
-		  @blockworld( south(), _ );
-      %goto( X, Y );
+    {
+	  @blockworld( south(), _ );
     }
   }
   startup(X,Y,C) <- true |
@@ -62,21 +58,21 @@ pcrules:
     @blockworld( enter(X, Y, C), _);
     @blockworld( getWorldSize(), WS);
     B(WS = [Width,Height]);
-		+worldSize(Width, Height);
+	+worldSize(Width, Height);
 
     @blockworld( getSenseRange(), SR );
-		B(SR = [S]);
+	B(SR = [S]);
     +senseRange(S);
   }
 
 prrules:
 	@blockworld( north(), _); REST1; <- true | {
 		@blockworld( sensePosition(), POS );
-    		B(POS = [A,B]);
-    		if B(B = 0) {
-    		    goto(8,8,0);
-    		}
-    		else {
+		B(POS = [A,B]);
+		if B(B = 0) {
+			goto(8,8,0);
+		}
+		else {
 		    @blockworld (east(), _);
 		    @blockworld (north(), _);
 		}
@@ -84,11 +80,11 @@ prrules:
 	}
 	@blockworld( east(), _); REST2; <- true | {
 		@blockworld( sensePosition(), POS );
-    		B(POS = [A,B]);
-    		if B(A = (W - 1)) {
-    		    goto(8,8,0);
-    		}
-    		else { 
+		B(POS = [A,B]);
+		if B(A = (W - 1)) {
+			goto(8,8,0);
+		}
+		else { 
 		    @blockworld (south(), _); 
 		    @blockworld (east(), _);
 		}
@@ -96,11 +92,11 @@ prrules:
 	}
 	@blockworld( south(), _); REST3; <- true | {
 		@blockworld( sensePosition(), POS );
-    		B(POS = [A,B]);
-    		if B(B = (H - 1)) {
-    		    goto(8,8,0);
-    		}
-    		else {
+		B(POS = [A,B]);
+		if B(B = (H - 1)) {
+			goto(8,8,0);
+		}
+		else {
 		    @blockworld (west(), _); 
 		    @blockworld (south(), _);
 		}
@@ -108,11 +104,11 @@ prrules:
 	}
 	@blockworld( west(), _); REST4; <- true | {
 		@blockworld( sensePosition(), POS );
-    		B(POS = [A,B]);
-    		if B(A = 0) {
-    		    goto(8,8,0);
-    		}
-    		else {
+		B(POS = [A,B]);
+		if B(A = 0) {
+			goto(8,8,0);
+		}
+		else {
 		    @blockworld (north(), _); 
 		    @blockworld (west(), _);
 		}
