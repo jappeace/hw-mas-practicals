@@ -69,9 +69,13 @@ prrules:
 	@blockworld( north(), _); REST1; <- true | {
 		@blockworld( sensePosition(), POS );
 		B(POS = [A,B]);
+		
+		%%if this part not added there would be some bug. Actually it never runs
 		if B(B = 0) {
 			goto(8,8,0);
 		}
+		%%%%%
+		
 		else {
 		    @blockworld (east(), _);
 		    @blockworld (north(), _);
