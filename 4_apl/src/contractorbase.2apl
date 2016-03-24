@@ -1,16 +1,22 @@
 beliefs:
-pc_case_mp(100000).
-pc_case_mpi(m,t,s,a,p,c,u,p).
+    
+    % initial cheapest bid for pc_case. pc_case_mpi is pc_case_minimum|price|item
+    pc_case_mpi(m,t,s,a,p,c,u,10000).
 
 
 goals:
     match().
 
 pgrules:
-    match() <- req_part(SPEC) and pc_case_mp(MIN_PRICE) and
-               pc_case_mpi(MANUF_M,TYPE_M,SHAPE_M,ATX_M,POWER_M,COL_M,SUITFOR_M,PRICE_M) | {
+    match() <- req_part(SPEC) and pc_case_mpi(MANUF_M,TYPE_M,SHAPE_M,ATX_M,POWER_M,COL_M,SUITFOR_M,PRICE_M) | {
+        % get the requierment from manager agent in SPEC
+        % and assign the parameter to varibles
 	    if B(SPEC = [pc_case(MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR)|REST]) {
 		    +ok(pc_case(MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR));
+            % replace unspec parameter(unspecified requierment) with _,
+            % then the contrator agent will ignore this parameter when he search his beliefbase.
+            % this make sure that  the manager can ask for pc components by only specifying 
+            % some attributes of the component
             if (B(not (MANUF = unspec))) {
                 B(MANUF = MANUF_R);
                 +pc_case_requery(MANUF_R);
@@ -39,17 +45,21 @@ pgrules:
                 B(SUITFOR = SUITFOR_R);
                 +pc_case_requery(SUITFOR_R);
             }
-
-		    if B(pc_case(MANUF_R,TYPE_R,SHAPE_R,ATX_R,POWER_R,COL_R,SUITFOR_R,PRICE)) {
-                if (PRICE < MIN_PRICE) {
-                    -pc_case_mp(MIN_PRICE);
-                    +pc_case_mp(PRICE);
+            % contractor agent search his belief base and find out the first matched item
+		    if B(pc_case(MANUF_R,TYPE_R,SHAPE_R,ATX_R,POWER_R,COL_R,SUITFOR_R,PRICE_R)) {
+                % if the price of current matched item is cheaper than the last one
+                % then replace the minimum price item with current one in his belief base
+                if (PRICE_R < PRICE_M) {
                     -pc_case_mpi(MANUF_M,TYPE_M,SHAPE_M,ATX_M,POWER_M,COL_M,SUITFOR_M,PRICE_M);
-                    +pc_case_mpi(MANUF_R,TYPE_R,SHAPE_R,ATX_R,POWER_R,COL_R,SUITFOR_R,PRICE);
+                    +pc_case_mpi(MANUF_R,TYPE_R,SHAPE_R,ATX_R,POWER_R,COL_R,SUITFOR_R,PRICE_R);
                 }
+                % delete the current matched item from belief base then search the next matched one
                 -pc_case(MANUF_R,TYPE_R,SHAPE_R,ATX_R,POWER_R,COL_R,SUITFOR_R,PRICE);
                 +found_pc_case;
 		    }
+            % if there is no more item matching the requierments from manager agent
+            % if there is at lease one matched item, then send the cheapest one to manager agent
+            % else send failure msg to manager agent
             else {
                 if B(found_pc_case) {
                   B(pc_case_mpi(MANUF_M,TYPE_M,SHAPE_M,ATX_M,POWER_M,COL_M,SUITFOR_M,PRICE_M) = PC_CASE_MPI);
@@ -67,6 +77,7 @@ pgrules:
 	}
 
 pcrules:
+    % receive the requierments from manager agent, and add it the beliefbase
     message( manager, cfp, La, On, part(SPEC) ) <- true | {
  	    +req_part(SPEC);
     }

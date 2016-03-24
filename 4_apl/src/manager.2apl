@@ -20,12 +20,67 @@ beliefs:
 
 goals:
 	announce.
+    compare.
 
 pgrules:
-announce <- not announced and wants(PARTS) |
-{
-	+announced;
-	send(contractor1, cfp, part(PARTS));
-	send(contractor2, cfp, part(PARTS));
-	send(contractor3, cfp, part(PARTS));
-}
+    % the manager agent annouce his requierments to all contractor agents 
+    % call for proposal step in C-Net
+    announce <- not announced and wants(PARTS) | {
+	    +announced;
+	    send(contractor1, cfp, part(PARTS));
+	    send(contractor2, cfp, part(PARTS));
+	    send(contractor3, cfp, part(PARTS));
+    }
+
+
+    % when receive proposals from all contractor agents, then manager agent
+    % then compare the price and pick the cheapest bid
+    % then send the msg with accept_proposal to the contrator agent with cheapest bid
+    % and also send other contractor agents a reject_proposal msg.
+    compare <- proposal_c1_pc_case(PC_CASE_C1) and
+               proposal_c2_pc_case(PC_CASE_C2) and
+               proposal_c3_pc_case(PC_CASE_C3) | {
+        if( B(PC_CASE_C1 = pc_case_mpi(MANUF_C1,TYPE_C1,SHAPE_C1,ATX_C1,POWER_C1,COL_C1,SUITFOR_C1,PRICE_C1))
+         && B(PC_CASE_C2 = pc_case_mpi(MANUF_C2,TYPE_C2,SHAPE_C2,ATX_C2,POWER_C2,COL_C2,SUITFOR_C2,PRICE_C2))
+         && B(PC_CASE_C3 = pc_case_mpi(MANUF_C3,TYPE_C3,SHAPE_C3,ATX_C3,POWER_C3,COL_C3,SUITFOR_C3,PRICE_C3)) ) {
+            % case when the bid from contractor1 is the cheapest
+            if ((PRICE_C1 <= PRICE_C2) && (PRICE_C1 <= PRICE_C3)) {
+                send(contractor1,inform,part(pc_case(accept)));
+                send(contractor2,inform,part(pc_case(reject)));
+                send(contractor3,inform,part(pc_case(reject)));
+            }
+            % case when the bid from contractor2 is the cheapest
+            else if ((PRICE_C2 <= PRICE_C1) && (PRICE_C2 <= PRICE_C3)) {
+                send(contractor1,inform,part(pc_case(reject)));
+                send(contractor2,inform,part(pc_case(accept)));
+                send(contractor3,inform,part(pc_case(reject)));
+            }
+            % case when the bid from contractor3 is the cheapest
+            else {
+                send(contractor1,inform,part(pc_case(reject)));
+                send(contractor2,inform,part(pc_case(reject)));
+                send(contractor3,inform,part(pc_case(accept)));
+            }
+        }
+        -proposal_c1_pc_case(PC_CASE_C1);
+        -proposal_c2_pc_case(PC_CASE_C2);
+        -proposal_c3_pc_case(PC_CASE_C3);
+    }
+               
+
+
+pcrules:
+    % receive the proposal from contractor1
+    message(contractor1,propose,La,On,repart(PC_CASE)) <- true | {
+        +proposal_c1_pc_case(PC_CASE);
+    }
+    
+    % receive the proposal from contractor2
+    message(contractor2,propose,La,On,repart(PC_CASE)) <- true | {
+        +proposal_c2_pc_case(PC_CASE);
+    }
+    
+    % receive the proposal from contractor3
+    message(contractor3,propose,La,On,repart(PC_CASE)) <- true | {
+        +proposal_c3_pc_case(PC_CASE);
+    }
