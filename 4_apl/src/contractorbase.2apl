@@ -1,78 +1,67 @@
 beliefs:
-    
     % initial cheapest bid for pc_case. pc_case_mpi is pc_case_minimum|price|item
-    pc_case_mpi(m,t,s,a,p,c,u,10000).
-
+    best_pc_case(initial,horible,cheapest,bid,d,c,u,10000).
 
 goals:
-    match().
+    match.
 
 pgrules:
-    match() <- req_part(SPEC) and pc_case_mpi(MANUF_M,TYPE_M,SHAPE_M,ATX_M,POWER_M,COL_M,SUITFOR_M,PRICE_M) | {
-        % get the requierment from manager agent in SPEC
+    match <- req_part(SPEC) and best_pc_case(MANUF_M,TYPE_M,SHAPE_M,ATX_M,POWER_M,COL_M,SUITFOR_M,PRICE_M) | {
+        % get the requirement from the manager agent in SPEC
         % and assign the parameter to varibles
-	    if B(SPEC = [pc_case(MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR)|REST]) {
-		    +ok(pc_case(MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR));
+	    if B(SPEC = pc_case(MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR)) {
             % replace unspec parameter(unspecified requierment) with _,
             % then the contrator agent will ignore this parameter when he search his beliefbase.
             % this make sure that  the manager can ask for pc components by only specifying 
             % some attributes of the component
             if (B(not (MANUF = unspec))) {
                 B(MANUF = MANUF_R);
-                +pc_case_requery(MANUF_R);
             }
             if (B(not (TYPE = unspec))) {
                 B(TYPE = TYPE_R);
-                +pc_case_requery(TYPE_R);
             }
             if (B(not (SHAPE = unspec))) {
                 B(SHAPE = SHAPE_R);
-                +pc_case_requery(SHAPE_R);
             }
             if (B(not (ATX = unspec))) {
                 B(ATX = ATX_R);
-                +pc_case_requery(ATX_R);
             }
             if (B(not (POWER = unspec))) {
                 B(POWER = POWER_R);
-                +pc_case_requery(POWER_R);
             }
             if (B(not (COL = unspec))) {
                 B(COL = COL_R);
-                +pc_case_requery(COL_R);
             }
             if (B(not (SUITFOR = unspec))) {
                 B(SUITFOR = SUITFOR_R);
-                +pc_case_requery(SUITFOR_R);
             }
             % contractor agent search his belief base and find out the first matched item
 		    if B(pc_case(MANUF_R,TYPE_R,SHAPE_R,ATX_R,POWER_R,COL_R,SUITFOR_R,PRICE_R)) {
+				% delete the current matched item from belief base then search the next matched one
+				-pc_case(MANUF_R,TYPE_R,SHAPE_R,ATX_R,_,COL_R,SUITFOR_R,_);
+
                 % if the price of current matched item is cheaper than the last one
                 % then replace the minimum price item with current one in his belief base
                 if (PRICE_R < PRICE_M) {
-                    -pc_case_mpi(MANUF_M,TYPE_M,SHAPE_M,ATX_M,POWER_M,COL_M,SUITFOR_M,PRICE_M);
-                    +pc_case_mpi(MANUF_R,TYPE_R,SHAPE_R,ATX_R,POWER_R,COL_R,SUITFOR_R,PRICE_R);
+                    -best_pc_case(MANUF_M,TYPE_M,SHAPE_M,ATX_M,POWER_M,COL_M,SUITFOR_M,PRICE_M);
+                    +best_pc_case(MANUF_R,TYPE_R,SHAPE_R,ATX_R,POWER_R,COL_R,SUITFOR_R,PRICE_R);
+
                 }
-                % delete the current matched item from belief base then search the next matched one
-                -pc_case(MANUF_R,TYPE_R,SHAPE_R,ATX_R,POWER_R,COL_R,SUITFOR_R,PRICE);
-                +found_pc_case;
+				+found_pc_case;
 		    }
-            % if there is no more item matching the requierments from manager agent
-            % if there is at lease one matched item, then send the cheapest one to manager agent
-            % else send failure msg to manager agent
             else {
+				% if there is no more item matching the requierments from manager agent
+				% if there is at lease one matched item, then send the cheapest one to manager agent
+				% else send failure msg to manager agent
                 if B(found_pc_case) {
-                  B(pc_case_mpi(MANUF_M,TYPE_M,SHAPE_M,ATX_M,POWER_M,COL_M,SUITFOR_M,PRICE_M) = PC_CASE_MPI);
-                  send(manager,propose,repart(PC_CASE_MPI));
-                }
-                else {
-		    	    +meiyou;
+                  B(best_pc_case(MANUF_M,TYPE_M,SHAPE_M,ATX_M,POWER_M,COL_M,SUITFOR_M,PRICE_M) = PC_CASE_MPI);
+                  send(manager,propose,offer(PC_CASE_MPI));
                 }
                 -req_part(SPEC);
 		    }
         }
         else {
-            +err;
+            +donthavepart(SPEC);
         }
 	}
 
@@ -81,3 +70,15 @@ pcrules:
     message( manager, cfp, La, On, part(SPEC) ) <- true | {
  	    +req_part(SPEC);
     }
+	message( manager, inform, La, On, offer(STATUS, best_pc_case(
+		MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR,PRICE
+	))) <- true | {
+		-best_pc_case(
+			MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR,PRICE
+		);
+		if B(is(STATUS,reject)){
+			+pc_case(
+				MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR,PRICE
+			);
+		}
+	}
