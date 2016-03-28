@@ -108,7 +108,7 @@ pgrules:
                 B(SIZE = SIZE_R);
             }
             % contractor agent search his belief base and find out the first matched item
-		    if B(pc_case(MANUF_R,TYPE_R,CHIPS_R,ATX_R,SUITFOR_R,SIZE_R, PRICE_R)) {
+		    if B(motherboard(MANUF_R,TYPE_R,CHIPS_R,ATX_R,SUITFOR_R,SIZE_R, PRICE_R)) {
 				sendresponse(propose,
 					motherboard(
 						MANUF_R,
@@ -124,7 +124,7 @@ pgrules:
 			else {
 				sendresponse(refuse, SPEC);
 			}
-        }else if B(SPEC = graphics_card(MANUF,TYPE,FEATURES)) {
+        }else if B(SPEC = graphic_card(MANUF,TYPE,NAME,FEATURES)) {
             % replace unspec parameter(unspecified requierment) with _,
             % then the contrator agent will ignore this parameter when he search his beliefbase.
             % this make sure that  the manager can ask for pc components by only specifying 
@@ -135,11 +135,14 @@ pgrules:
             if (B(not (TYPE = unspec))) {
                 B(TYPE = TYPE_R);
             }
+            if (B(not (NAME = unspec))) {
+                B(NAME = NAME_R);
+            }
             if (B(not (FEATURES = unspec))) {
                 B(FEATURES = FEATURES_R);
             }
             % contractor agent search his belief base and find out the first matched item
-		    if B(pc_case(MANUF_R,TYPE_R,FEATURES_R, PRICE_R)) {
+		    if B(graphic_card(MANUF_R,TYPE_R,NAME_R,FEATURES_R, PRICE_R)) {
 				sendresponse(propose,
 					graphic_card(
 						MANUF_R,
@@ -176,4 +179,8 @@ pcrules:
 	sendresponse(ISACEPTED, ITEM) <- requirement(_) | {
 		send(manager,ISACEPTED,offer(ITEM));
 		DropRequirement();
+	}
+
+	message( manager, failure, La, On, offer(PC_CASE)) <- true | {
+		send(manager, propose, offer(PC_CASE));
 	}

@@ -1,4 +1,4 @@
-%TODO: use pc's intead of compontents
+%TODO: use pc's intead of compontens
 beliefs:
 	wants([
 		pc_case(
@@ -16,8 +16,26 @@ beliefs:
 			2.0,
 			128,
 			unspec
+		),
+		motherboard(
+			intel,
+			'Intel Desktop Board D865PERL',
+			'Intel 865PE',
+			atx,
+			unspec,
+			unspec
+		),
+		graphic_card(
+			radeon,
+			'ATI RADEON 7000 Graphics card',
+			'Graphics Card',
+			unspec
 		)
 	]).
+
+	announce :- waiting(_).
+	awardContract :- not receivedOffers(_).
+
 
 beliefupdates:
 	{waiting(TIME)} Wait() {not waiting(TIME), waiting(TIME+1)}
@@ -29,23 +47,26 @@ goals:
 pgrules:
     % the manager agent annouce his requierments to all contractor agents 
     % call for proposal step in C-Net
-    announce <- not waiting(_) and wants(PARTS) and not receivedOffers(_) | {
+    announce <- wants(PARTS) and not receivedOffers(_)| {
+		+receivedOffers([]);
 	    if B(PARTS = [PART|REST]) {
 			-wants(PARTS);
 			+wants(REST);
-			+waiting(0);
-			adoptz(wait);
 			send(contractor1, cfp, part(PART));
 			send(contractor2, cfp, part(PART));
 			send(contractor3, cfp, part(PART));
+
+			adoptz(wait);
+			+waiting(0);
 		}
 
     }
 
 	wait <- waiting(TIME) | {
-		if (TIME > 50) {
+		if B(TIME > 50) {
 			adoptz(awardContract);
 			-waiting(TIME);
+			dropgoal(wait);
 		}else{
 			Wait();
 		}
@@ -58,22 +79,26 @@ pgrules:
     % and also send other contractor agents a reject_proposal msg.
     awardContract <- receivedOffers(OFFERS)| {
 		sendMessages(OFFERS, offer(init, pc_case(a,a,a,a,a,a,a,99999999)));
+		adoptz(announce);
 		-receivedOffers(OFFERS);
     }
 
 pcrules:
     % receive the proposal from a contractor
-    message(CONTRACTOR,propose,La,On,offer(PC_CASE)) <- true | {
+	% there is some race condition going on between incoming messages,
+	% I think they're handled on seperate threads, so we use receivedOffers as
+	% a locking mechanism, the locked out messages fall trough to the next
+	% method. Don't ask me why you would handle messages on seperate threads
+    message(CONTRACTOR,propose,La,On,offer(PC_CASE)) <- receivedOffers(EXISTING) | {
+		-receivedOffers(EXISTING);
 		% create a new believe list with repsonses (not gonna work with that unstable believe base).
-		if(B(not receivedOffers(_))){
-			+receivedOffers([offer(CONTRACTOR, PC_CASE)]);
-		}else{
-			B(receivedOffers(EXISTING));
-			B(append([offer(CONTRACTOR, PC_CASE)], EXISTING, NEW));
-			-receivedOffers(EXISTING);
-			+receivedOffers(NEW);
-		}
+		B(append([offer(CONTRACTOR, PC_CASE)], EXISTING, NEW));
+		+receivedOffers(NEW);
     }
+    message(CONTRACTOR,propose,La,On,offer(PC_CASE)) <- true | {
+		% to prevent the race condition, let the contractor retry
+		send(CONTRACTOR, failure, offer(PC_CASE));
+	}
 	% inform contractors if their offers are accepted or rejected
 	sendMessages(REMAINING, offer(B_CONTRACTOR, B_ITEM)) <- true | {
 		if B(REMAINING = [offer(CUR_CONTRACTOR, CUR_ITEM)| REST]){
@@ -90,7 +115,10 @@ pcrules:
 
 			if B(CUR_PRICE < B_PRICE) {
 				% If we found a better one reject the previous best
-				send(B_CONTRACTOR,inform,offer(reject, B_ITEM));
+				if B(not B_CONTRACTOR = init){
+					%don't set messages to the dummy contractor
+					send(B_CONTRACTOR,inform,offer(reject, B_ITEM));
+				}
 				sendMessages(REST, offer(CUR_CONTRACTOR, CUR_ITEM));
 			}else{
 				% If the current isn't better reject current
@@ -99,6 +127,8 @@ pcrules:
 			}
 		}else{
 			% If we're at the end of the list best is accepted
-			send(B_CONTRACTOR,inform,offer(accept, B_ITEM));
+			if B(not B_CONTRACTOR = init){
+				send(B_CONTRACTOR,inform,offer(accept, B_ITEM));
+			}%else we didn't get the part.
 		}
 	}
