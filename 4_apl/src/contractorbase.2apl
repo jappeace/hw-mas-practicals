@@ -1,12 +1,8 @@
-beliefs:
-    % initial cheapest bid for pc_case. pc_case_mpi is pc_case_minimum|price|item
-    best_pc_case(initial,horible,cheapest,bid,d,c,u,10000).
-
 goals:
     match.
 
 pgrules:
-    match <- req_part(SPEC) and best_pc_case(MANUF_M,TYPE_M,SHAPE_M,ATX_M,POWER_M,COL_M,SUITFOR_M,PRICE_M) | {
+    match <- req_part(SPEC) | {
         % get the requirement from the manager agent in SPEC
         % and assign the parameter to varibles
 	    if B(SPEC = pc_case(MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR)) {
@@ -37,31 +33,15 @@ pgrules:
             }
             % contractor agent search his belief base and find out the first matched item
 		    if B(pc_case(MANUF_R,TYPE_R,SHAPE_R,ATX_R,POWER_R,COL_R,SUITFOR_R,PRICE_R)) {
-				% delete the current matched item from belief base then search the next matched one
-				-pc_case(MANUF_R,TYPE_R,SHAPE_R,ATX_R,_,COL_R,SUITFOR_R,_);
-
-                % if the price of current matched item is cheaper than the last one
-                % then replace the minimum price item with current one in his belief base
-                if (PRICE_R < PRICE_M) {
-                    -best_pc_case(MANUF_M,TYPE_M,SHAPE_M,ATX_M,POWER_M,COL_M,SUITFOR_M,PRICE_M);
-                    +best_pc_case(MANUF_R,TYPE_R,SHAPE_R,ATX_R,POWER_R,COL_R,SUITFOR_R,PRICE_R);
-
-                }
-				+found_pc_case;
+				B(best_pc_case(MANUF_R,TYPE_R,SHAPE_R,ATX_R,POWER_R,COL_R,SUITFOR_R,PRICE_R) = PC_CASE);
+				send(manager,propose,offer(PC_CASE));
+				-req_part(SPEC);
 		    }
-            else {
-				% if there is no more item matching the requierments from manager agent
-				% if there is at lease one matched item, then send the cheapest one to manager agent
-				% else send failure msg to manager agent
-                if B(found_pc_case) {
-                  B(best_pc_case(MANUF_M,TYPE_M,SHAPE_M,ATX_M,POWER_M,COL_M,SUITFOR_M,PRICE_M) = PC_CASE_MPI);
-                  send(manager,propose,offer(PC_CASE_MPI));
-                }
-                -req_part(SPEC);
-		    }
-        }
-        else {
-            +donthavepart(SPEC);
+			else {
+				send(manager,refuse,offer(SPEC));
+				-req_part(SPEC)
+				+donthavepart(SPEC);
+			}
         }
 	}
 
@@ -73,11 +53,8 @@ pcrules:
 	message( manager, inform, La, On, offer(STATUS, best_pc_case(
 		MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR,PRICE
 	))) <- true | {
-		-best_pc_case(
-			MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR,PRICE
-		);
-		if B(is(STATUS,reject)){
-			+pc_case(
+		if B(STATUS = accept){
+			-pc_case(
 				MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR,PRICE
 			);
 		}
