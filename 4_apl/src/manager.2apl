@@ -115,20 +115,14 @@ pcrules:
 
 			if B(CUR_PRICE < B_PRICE) {
 				% If we found a better one reject the previous best
-				if B(not B_CONTRACTOR = init){
-					%don't set messages to the dummy contractor
-					send(B_CONTRACTOR,inform,offer(reject, B_ITEM));
-				}
 				sendMessages(REST, offer(CUR_CONTRACTOR, CUR_ITEM));
 			}else{
-				% If the current isn't better reject current
-                send(CUR_CONTRACTOR,inform,offer(reject, CUR_ITEM));
 				sendMessages(REST, offer(B_CONTRACTOR, B_ITEM));
 			}
 		}else{
 			% If we're at the end of the list best is accepted
 			if B(not B_CONTRACTOR = init){
-				send(B_CONTRACTOR,inform,offer(accept, B_ITEM));
+				send(B_CONTRACTOR,inform,part(B_ITEM));
 			}%else we didn't get the part.
 		}
 	}

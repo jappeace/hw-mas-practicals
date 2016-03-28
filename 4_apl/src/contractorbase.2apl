@@ -166,14 +166,18 @@ pcrules:
     message( manager, cfp, La, On, part(SPEC) ) <- true | {
  	    +requirement(SPEC);
     }
-	message( manager, inform, La, On, offer(STATUS, best_pc_case(
-		MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR,PRICE
-	))) <- true | {
-		if B(STATUS = accept){
-			-pc_case(
-				MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR,PRICE
-			);
-		}
+	%remember, keep your code DRY!
+	message( manager, inform, La, On, part(pc_case(MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR,PRICE))) <- true | {
+		-pc_case(MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR,PRICE);
+	}
+	message( manager, inform, La, On, part(processor(MANUF,TYPE,SPEED,CACHE,SUITFOR,PRICE))) <- true | {
+		-processor(MANUF,TYPE,SPEED,CACHE,SUITFOR,PRICE);
+	}
+	message( manager, inform, La, On, part(motherboard(MANUF,TYPE,CHIPS,ATX,SUITFOR,SIZE, PRICE))) <- true | {
+		-motherboard(MANUF,TYPE,CHIPS,ATX,SUITFOR,SIZE, PRICE);
+	}
+	message( manager, inform, La, On, part(graphic_card(MANUF,TYPE,NAME,FEATURES, PRICE))) <- true | {
+		-graphic_card(MANUF,TYPE,NAME,FEATURES, PRICE);
 	}
 
 	sendresponse(ISACEPTED, ITEM) <- requirement(_) | {
