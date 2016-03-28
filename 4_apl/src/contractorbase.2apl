@@ -33,14 +33,25 @@ pgrules:
             }
             % contractor agent search his belief base and find out the first matched item
 		    if B(pc_case(MANUF_R,TYPE_R,SHAPE_R,ATX_R,POWER_R,COL_R,SUITFOR_R,PRICE_R)) {
-				B(best_pc_case(MANUF_R,TYPE_R,SHAPE_R,ATX_R,POWER_R,COL_R,SUITFOR_R,PRICE_R) = PC_CASE);
-				send(manager,propose,offer(PC_CASE));
+				send(manager,propose,
+					offer(
+						pc_case(
+							MANUF_R,
+							TYPE_R,
+							SHAPE_R,
+							ATX_R,
+							POWER_R,
+							COL_R,
+							SUITFOR_R,
+							PRICE_R
+						)
+					)
+				);
 				-req_part(SPEC);
 		    }
 			else {
 				send(manager,refuse,offer(SPEC));
-				-req_part(SPEC)
-				+donthavepart(SPEC);
+				-req_part(SPEC);
 			}
         }
 	}
