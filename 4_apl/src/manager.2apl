@@ -14,7 +14,8 @@ beliefs:
 			intel,
 			'Intel Celeron A',
 			2.0,
-			128
+			128,
+			unspec
 		)
 	]).
 
@@ -61,8 +62,9 @@ pgrules:
     }
 
 pcrules:
-    % receive the proposal from contractor1
+    % receive the proposal from a contractor
     message(CONTRACTOR,propose,La,On,offer(PC_CASE)) <- true | {
+		% create a new believe list with repsonses (not gonna work with that unstable believe base).
 		if(B(not receivedOffers(_))){
 			+receivedOffers([offer(CONTRACTOR, PC_CASE)]);
 		}else{

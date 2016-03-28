@@ -1,8 +1,11 @@
 goals:
     match.
 
+beliefupdates:
+	{requirement(SPEC)} DropRequirement(){not requirement(SPEC)}
+
 pgrules:
-    match <- req_part(SPEC) | {
+    match <- requirement(SPEC) | {
         % get the requirement from the manager agent in SPEC
         % and assign the parameter to varibles
 	    if B(SPEC = pc_case(MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR)) {
@@ -33,33 +36,132 @@ pgrules:
             }
             % contractor agent search his belief base and find out the first matched item
 		    if B(pc_case(MANUF_R,TYPE_R,SHAPE_R,ATX_R,POWER_R,COL_R,SUITFOR_R,PRICE_R)) {
-				send(manager,propose,
-					offer(
-						pc_case(
-							MANUF_R,
-							TYPE_R,
-							SHAPE_R,
-							ATX_R,
-							POWER_R,
-							COL_R,
-							SUITFOR_R,
-							PRICE_R
-						)
+				sendresponse(propose,
+					pc_case(
+						MANUF_R,
+						TYPE_R,
+						SHAPE_R,
+						ATX_R,
+						POWER_R,
+						COL_R,
+						SUITFOR_R,
+						PRICE_R
 					)
 				);
-				-req_part(SPEC);
 		    }
 			else {
-				send(manager,refuse,offer(SPEC));
-				-req_part(SPEC);
+				sendresponse(refuse, SPEC);
+			}
+        } else if B(SPEC = processor(MANUF,TYPE,SPEED,CACHE,SUITFOR)) {
+			% do the same I'm not gonna learn reflection in prolog trick
+
+            if (B(not (MANUF = unspec))) {
+                B(MANUF = MANUF_R);
+            }
+            if (B(not (TYPE = unspec))) {
+                B(TYPE = TYPE_R);
+            }
+            if (B(not (SPEED = unspec))) {
+                B(SPEED = SPEED_R);
+            }
+            if (B(not (CACHE = unspec))) {
+                B(CACHE = CACHE_R);
+            }
+            if (B(not (SUITFOR = unspec))) {
+                B(SUITFOR = SUITFOR_R);
+            }
+            % contractor agent search his belief base and find out the first matched item
+		    if B(processor(MANUF_R,TYPE_R,SPEED_R,CACHE_R,SUITFOR_R,PRICE_R)) {
+				sendresponse(propose,processor(
+					MANUF_R,
+					TYPE_R,
+					SPEED_R,
+					CACHE_R,
+					SUITFOR_R,
+					PRICE_R
+				));
+		    }
+			else {
+				sendresponse(refuse, SPEC);
+			}
+        }else if B(SPEC = motherboard(MANUF,TYPE,CHIPS,ATX,SUITFOR,SIZE)) {
+            % replace unspec parameter(unspecified requierment) with _,
+            % then the contrator agent will ignore this parameter when he search his beliefbase.
+            % this make sure that  the manager can ask for pc components by only specifying 
+            % some attributes of the component
+            if (B(not (MANUF = unspec))) {
+                B(MANUF = MANUF_R);
+            }
+            if (B(not (TYPE = unspec))) {
+                B(TYPE = TYPE_R);
+            }
+            if (B(not (CHIPS = unspec))) {
+                B(CHIPS = CHIPS_R);
+            }
+            if (B(not (ATX = unspec))) {
+                B(ATX = ATX_R);
+            }
+            if (B(not (SUITFOR = unspec))) {
+                B(SUITFOR = SUITFOR_R);
+            }
+            if (B(not (SIZE = unspec))) {
+                B(SIZE = SIZE_R);
+            }
+            % contractor agent search his belief base and find out the first matched item
+		    if B(pc_case(MANUF_R,TYPE_R,CHIPS_R,ATX_R,SUITFOR_R,SIZE_R, PRICE_R)) {
+				sendresponse(propose,
+					motherboard(
+						MANUF_R,
+						TYPE_R,
+						CHIPS_R,
+						ATX_R,
+						SUITFOR_R,
+						SIZE_R,
+						PRICE_R
+					)
+				);
+		    }
+			else {
+				sendresponse(refuse, SPEC);
+			}
+        }else if B(SPEC = graphics_card(MANUF,TYPE,FEATURES)) {
+            % replace unspec parameter(unspecified requierment) with _,
+            % then the contrator agent will ignore this parameter when he search his beliefbase.
+            % this make sure that  the manager can ask for pc components by only specifying 
+            % some attributes of the component
+            if (B(not (MANUF = unspec))) {
+                B(MANUF = MANUF_R);
+            }
+            if (B(not (TYPE = unspec))) {
+                B(TYPE = TYPE_R);
+            }
+            if (B(not (FEATURES = unspec))) {
+                B(FEATURES = FEATURES_R);
+            }
+            % contractor agent search his belief base and find out the first matched item
+		    if B(pc_case(MANUF_R,TYPE_R,FEATURES_R, PRICE_R)) {
+				sendresponse(propose,
+					graphic_card(
+						MANUF_R,
+						TYPE_R,
+						FEATURES_R,
+						PRICE_R
+					)
+				);
+		    }
+			else {
+				sendresponse(refuse, SPEC);
 			}
         }
+		else {
+			sendresponse(refuse, SPEC);
+		}
 	}
 
 pcrules:
     % receive the requierments from manager agent, and add it the beliefbase
     message( manager, cfp, La, On, part(SPEC) ) <- true | {
- 	    +req_part(SPEC);
+ 	    +requirement(SPEC);
     }
 	message( manager, inform, La, On, offer(STATUS, best_pc_case(
 		MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR,PRICE
@@ -69,4 +171,9 @@ pcrules:
 				MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR,PRICE
 			);
 		}
+	}
+
+	sendresponse(ISACEPTED, ITEM) <- requirement(_) | {
+		send(manager,ISACEPTED,offer(ITEM));
+		DropRequirement();
 	}
