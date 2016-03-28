@@ -78,13 +78,16 @@ pcrules:
 			B(pc_case(_,_,_,_,_,_,_,CUR_PRICE) = CUR_PC_CASE);
 			B(pc_case(_,_,_,_,_,_,_,B_PRICE) = B_PC_CASE);
 			if B(CUR_PRICE < B_PRICE) {
+				% If we found a better one reject the previous best
 				send(B_CONTRACTOR,inform,offer(reject, B_PC_CASE));
 				sendMessages(REST, offer(CUR_CONTRACTOR, CUR_PC_CASE));
 			}else{
+				% If the current isn't better reject current
                 send(CUR_CONTRACTOR,inform,offer(reject, CUR_PC_CASE));
 				sendMessages(REST, offer(B_CONTRACTOR, B_PC_CASE));
 			}
 		}else{
+			% If we're at the end of the list best is accepted
 			send(B_CONTRACTOR,inform,offer(accept, B_PC_CASE));
 		}
 	}
