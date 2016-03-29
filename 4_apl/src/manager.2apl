@@ -1,5 +1,6 @@
 beliefs:
-	wants([
+	desired_pcs([
+	pc(
 		pc_case(
             unspec,
             unspec,
@@ -30,21 +31,65 @@ beliefs:
 			'Graphics Card',
 			unspec
 		)
+	),
+	pc(
+		pc_case(
+            unspec,
+            unspec,
+            unspec,
+			unspec,
+            unspec,
+			unspec,
+            unspec
+		),
+		processor(
+			intel,
+			'Intel Celeron A',
+			2.0,
+			128,
+			unspec
+		),
+		motherboard(
+			intel,
+			'Intel Desktop Board D865PERL',
+			'Intel 865PE',
+			atx,
+			['celeron', 'Pentium 4'],
+			unspec
+		),
+		graphic_card(
+			radeon,
+			'ATI RADEON 7000 Graphics card',
+			'Graphics Card',
+			unspec
+		)
+	)
 	]).
 
 	announce :- waiting(_).
 	% , = and, because reasons
 	awardContract :- not offer(_,_) , not best_offer(_,_).
 
+	queue_pc :- wants(_).
 
 beliefupdates:
 	{waiting(TIME)} Wait() {not waiting(TIME), waiting(TIME+1)}
 
 
 goals:
-	announce.
+	queue_pc.
 
 pgrules:
+	queue_pc <- desired_pcs(PC_LIST) | {
+	    if B(PC_LIST = [pc(A,B,C,D)|REST]) {
+			-desired_pcs(PC_LIST);
+			+desired_pcs(REST);
+			adoptz(announce);
+			+wants([A,B,C,D]);
+		}else{
+			dropgoal(queue_pc);
+		}
+	}
     % the manager agent annouce his requierments to all contractor agents 
     % call for proposal step in C-Net
     announce <- wants(PARTS) and not offer(_,_) and not best_offer(_,_)| {
@@ -60,6 +105,7 @@ pgrules:
 			+waiting(0);
 		}else{
 			-wants([]);
+			adoptz(queue_pc);
 			dropgoal(announce);
 		}
     }
@@ -119,7 +165,7 @@ pgrules:
 			% ding ding ding, we have a winner!
 			send(B_CONTRACTOR,inform,part(B_ITEM));
 			adoptz(announce);
-			+contract(B_CONTRACTOR, B_ITEM);
+			+contract(B_CONTRACTOR, in_progress, B_ITEM);
 			-best_offer(B_CONTRACTOR, B_ITEM);
 		}
     }
