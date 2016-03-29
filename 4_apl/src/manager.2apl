@@ -22,7 +22,7 @@ beliefs:
 			'Intel Desktop Board D865PERL',
 			'Intel 865PE',
 			atx,
-			['celeron', 'Pentium 4'],
+			['celeron', 'pentium4'],
 			unspec
 		),
 		graphic_card(
