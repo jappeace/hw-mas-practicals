@@ -179,8 +179,6 @@ pcrules:
 		if B(contract(CONTRACTOR, in_progress, ITEM)){
 			-contract(CONTRACTOR, in_progress, ITEM);
 			+contract(CONTRACTOR, finished, ITEM);
-		}else{
-			+wtf(CONTRACTOR, ITEM);
 		}
 	}
 	message(CONTRACTOR,inform,La,On,whatisthis(NUMBER)) <- true | {
