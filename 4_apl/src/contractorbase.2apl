@@ -1,10 +1,23 @@
+beliefs:
+	match :- not requirement(_).
 goals:
     match.
 
 beliefupdates:
 	{requirement(SPEC)} DropRequirement(){not requirement(SPEC)}
+	{duration(TIME)} Wait() {not duration(TIME), duration(TIME+1)}
 
 pgrules:
+	makePart <- duration(TIME) and construct(CONST_TIME, PART) | {
+		if B(TIME > CONST_TIME) {
+			-duration(TIME);
+			-construct(CONST_TIME,PART);
+			send(manager,inform,finished(PART));
+			dropgoal(makePart);
+		}else{
+			Wait();
+		}
+	}
     match <- requirement(SPEC) | {
 		%TODO: re add searching trough the believe base...
         % get the requirement from the manager agent in SPEC
@@ -165,21 +178,19 @@ pgrules:
 pcrules:
     % receive the requierments from manager agent, and add it the beliefbase
     message( manager, cfp, La, On, part(SPEC) ) <- true | {
- 	    +requirement(SPEC);
+		+requirement(SPEC);
+		if B(duration(_)){
+			% busy, lets not fuckup the believe base (duration is volitile)
+			sendresponse(refuse, SPEC);
+		}else{
+			adoptz(match);
+		}
     }
-	%remember, keep your code DRY!
-	% If we won a bid, we sold it, so we can remove the component
-	message( manager, inform, La, On, part(pc_case(MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR,PRICE))) <- true | {
-		-pc_case(MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR,PRICE);
-	}
-	message( manager, inform, La, On, part(processor(MANUF,TYPE,SPEED,CACHE,SUITFOR,PRICE))) <- true | {
-		-processor(MANUF,TYPE,SPEED,CACHE,SUITFOR,PRICE);
-	}
-	message( manager, inform, La, On, part(motherboard(MANUF,TYPE,CHIPS,ATX,SUITFOR,SIZE, PRICE))) <- true | {
-		-motherboard(MANUF,TYPE,CHIPS,ATX,SUITFOR,SIZE, PRICE);
-	}
-	message( manager, inform, La, On, part(graphic_card(MANUF,TYPE,NAME,FEATURES, PRICE))) <- true | {
-		-graphic_card(MANUF,TYPE,NAME,FEATURES, PRICE);
+	message( manager, inform, La, On, part(PART)) <- true | {
+		% Yes! We got the contract!
+		+duration(0);
+		+construct(40, PART);
+		adoptz(makePart);
 	}
 
 	sendresponse(ISACEPTED, ITEM) <- requirement(_) | {

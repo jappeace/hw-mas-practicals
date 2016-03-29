@@ -175,3 +175,11 @@ pcrules:
     message(CONTRACTOR,propose,La,On,offer(ITEM)) <- true | {
 		+offer(CONTRACTOR, ITEM);
     }
+    message(CONTRACTOR,inform,La,On,finished(ITEM)) <- true | {
+		if B(contract(CONTRACTOR, in_progress, ITEM)){
+			-contract(CONTRACTOR, in_progress, ITEM);
+			+contract(CONTRACTOR, finished, ITEM);
+		}else{
+			+wtf(CONTRACTOR, ITEM);
+		}
+	}
