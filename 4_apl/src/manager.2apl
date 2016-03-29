@@ -15,7 +15,7 @@ beliefs:
 			'Intel Celeron A',
 			2.0,
 			128,
-			unspec
+			['celeron', 'Pentium 4']
 		),
 		motherboard(
 			intel,
@@ -34,7 +34,8 @@ beliefs:
 	]).
 
 	announce :- waiting(_).
-	awardContract :- not receivedOffers(_).
+	% , = and, because reasons
+	awardContract :- not offer(_,_) , not best_offer(_,_).
 
 
 beliefupdates:
@@ -47,11 +48,11 @@ goals:
 pgrules:
     % the manager agent annouce his requierments to all contractor agents 
     % call for proposal step in C-Net
-    announce <- wants(PARTS) and not receivedOffers(_)| {
-		+receivedOffers([]);
+    announce <- wants(PARTS) and not offer(_,_) and not best_offer(_,_)| {
 	    if B(PARTS = [PART|REST]) {
 			-wants(PARTS);
 			+wants(REST);
+			+requested_part(PART);
 			send(contractor1, cfp, part(PART));
 			send(contractor2, cfp, part(PART));
 			send(contractor3, cfp, part(PART));
@@ -64,8 +65,19 @@ pgrules:
 
 	wait <- waiting(TIME) | {
 		if B(TIME > 50) {
-			adoptz(awardContract);
 			-waiting(TIME);
+			if B(offer(_,_)){
+				if B(requested_part(PART)){
+					-requested_part(PART);
+				}
+				adoptz(awardContract);
+			}else{
+				if B(requested_part(PART)){
+					+no_offers_for(PART);
+					-requested_part(PART);
+				}
+				adoptz(announce);
+			}
 			dropgoal(wait);
 		}else{
 			Wait();
@@ -77,52 +89,39 @@ pgrules:
     % then compare the price and pick the cheapest bid
     % then send the msg with accept_proposal to the contrator agent with cheapest bid
     % and also send other contractor agents a reject_proposal msg.
-    awardContract <- receivedOffers(OFFERS)| {
-		sendMessages(OFFERS, offer(init, pc_case(a,a,a,a,a,a,a,99999999)));
-		adoptz(announce);
-		-receivedOffers(OFFERS);
-    }
-
-pcrules:
-    % receive the proposal from a contractor
-	% there is some race condition going on between incoming messages,
-	% I think they're handled on seperate threads, so we use receivedOffers as
-	% a locking mechanism, the locked out messages fall trough to the next
-	% method. Don't ask me why you would handle messages on seperate threads
-    message(CONTRACTOR,propose,La,On,offer(PC_CASE)) <- receivedOffers(EXISTING) | {
-		-receivedOffers(EXISTING);
-		% create a new believe list with repsonses (not gonna work with that unstable believe base).
-		B(append([offer(CONTRACTOR, PC_CASE)], EXISTING, NEW));
-		+receivedOffers(NEW);
-    }
-    message(CONTRACTOR,propose,La,On,offer(PC_CASE)) <- true | {
-		% to prevent the race condition, let the contractor retry
-		send(CONTRACTOR, failure, offer(PC_CASE));
-	}
-	% inform contractors if their offers are accepted or rejected
-	sendMessages(REMAINING, offer(B_CONTRACTOR, B_ITEM)) <- true | {
-		if B(REMAINING = [offer(CUR_CONTRACTOR, CUR_ITEM)| REST]){
+    awardContract <- offer(CONTRACTOR, ITEM) | {
+		if B(best_offer(B_CONTRACTOR,B_ITEM)){
 			% the last var is always the price,
 			% if there were a function that could count subvars in a term
 			% then we can always extract the price. Its called functor, exraction
 			% function is called
 			% this only works because price is always last.
-			B(functor(CUR_ITEM, _, CUR_VARCOUNT));
-			B(arg(CUR_VARCOUNT, CUR_ITEM, CUR_PRICE));
+			B(functor(ITEM, _, VARCOUNT));
+			B(arg(VARCOUNT, ITEM, PRICE));
 			% same extraction procedure for the B item
 			B(functor(B_ITEM, _, B_VARCOUNT));
 			B(arg(B_VARCOUNT, B_ITEM, B_PRICE));
 
-			if B(CUR_PRICE < B_PRICE) {
+			if B(PRICE < B_PRICE) {
 				% If we found a better one reject the previous best
-				sendMessages(REST, offer(CUR_CONTRACTOR, CUR_ITEM));
-			}else{
-				sendMessages(REST, offer(B_CONTRACTOR, B_ITEM));
+				-best_offer(B_CONTRACTOR, B_ITEM);
+				+best_offer(CONTRACTOR, ITEM);
 			}
 		}else{
-			% If we're at the end of the list best is accepted
-			if B(not B_CONTRACTOR = init){
-				send(B_CONTRACTOR,inform,part(B_ITEM));
-			}%else we didn't get the part.
+			+best_offer(CONTRACTOR, ITEM);
 		}
-	}
+		-offer(CONTRACTOR, ITEM);
+		if B((not offer(_,_)) and best_offer(B_CONTRACTOR,B_ITEM)){
+			% ding ding ding, we have a winner!
+			send(B_CONTRACTOR,inform,part(B_ITEM));
+			adoptz(announce);
+			+contract(B_CONTRACTOR, B_ITEM);
+			-best_offer(B_CONTRACTOR, B_ITEM);
+		}
+    }
+
+pcrules:
+    % receive the proposal from a contractor
+    message(CONTRACTOR,propose,La,On,offer(ITEM)) <- true | {
+		+offer(CONTRACTOR, ITEM);
+    }

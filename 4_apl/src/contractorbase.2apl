@@ -185,7 +185,3 @@ pcrules:
 		send(manager,ISACEPTED,offer(ITEM));
 		DropRequirement();
 	}
-
-	message( manager, failure, La, On, offer(PC_CASE)) <- true | {
-		send(manager, propose, offer(PC_CASE));
-	}

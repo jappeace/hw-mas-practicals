@@ -164,7 +164,7 @@ motherboard(intel,
 'Intel Desktop Board D865PERL',  
 'Intel 865PE', 
 atx, 
-['Celeron', 'Pentium 4'], 
+['celeron', 'Pentium 4'], 
 12.02 * 9.61, 
 321).
 
@@ -172,7 +172,7 @@ motherboard(asus,
 'Asustek A7N8X Deluxe Motherboard',
 'NVidia nForce2 SPP', 
 atx, 
-['Athlon', 'Athlon XP', 'Duron'], 
+['athlon', 'Athlon XP', 'Duron'], 
 12.02 * 9.65,
 143).
 
@@ -180,7 +180,7 @@ motherboard(intel,
 'Intel Desktop Board D865GLC',  
 'Intel 865G', 
 micro_atx, 
-['Celeron', 'Pentium 4'], 
+['celeron', 'Pentium 4'], 
 9.61 * 9.61, 
 129).
 
