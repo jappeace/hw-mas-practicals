@@ -70,8 +70,6 @@ beliefs:
 	% , = and, because reasons
 	awardContract :- not offer(_,_) , not best_offer(_,_).
 
-	queue_pc :- wants(_).
-
 beliefupdates:
 	{waiting(TIME)} Wait() {not waiting(TIME), waiting(TIME+1)}
 
@@ -82,32 +80,27 @@ goals:
 pgrules:
 	queue_pc <- desired_pc(COUNT,A,B,C,D) | {
 		-desired_pc(COUNT,A,B,C,D);
-		if(COUNT > 1){
+		if B(COUNT > 1){
 			+desired_pc(COUNT-1,A,B,C,D);
 		}
-		% second round this is bugged for some reason.
+		+desirePart(A);
+		+desirePart(B);
+		+desirePart(C);
+		+desirePart(D);
 		adoptz(announce);
-		% it never accepts another wants for the second time.
-		+wants([A,B,C,D]);
+		dropgoal(queue_pc);
 	}
     % the manager agent annouce his requierments to all contractor agents 
     % call for proposal step in C-Net
-    announce <- wants(PARTS) and not offer(_,_) and not best_offer(_,_)| {
-	    if B(PARTS = [PART|REST]) {
-			-wants(PARTS);
-			+wants(REST);
-			+requested_part(PART);
-			send(contractor1, cfp, part(PART));
-			send(contractor2, cfp, part(PART));
-			send(contractor3, cfp, part(PART));
+    announce <- desirePart(PART) and not offer(_,_) and not best_offer(_,_)| {
+		-desirePart(PART);
+		+requested_part(PART);
+		send(contractor1, cfp, part(PART));
+		send(contractor2, cfp, part(PART));
+		send(contractor3, cfp, part(PART));
 
-			adoptz(wait);
-			+waiting(0);
-		}else{
-			-wants([]);
-			adoptz(queue_pc);
-			dropgoal(announce);
-		}
+		adoptz(wait);
+		+waiting(0);
     }
 
 	wait <- waiting(TIME) | {
@@ -123,7 +116,11 @@ pgrules:
 					+no_offers_for(PART);
 					-requested_part(PART);
 				}
-				adoptz(announce);
+				if B(desirePart(_)){
+					adoptz(announce);
+				}else{
+					adoptz(queue_pc);
+				}
 			}
 			dropgoal(wait);
 		}else{
@@ -164,7 +161,11 @@ pgrules:
 		if B((not offer(_,_)) and best_offer(B_CONTRACTOR,B_ITEM)){
 			% ding ding ding, we have a winner!
 			send(B_CONTRACTOR,inform,part(B_ITEM));
-			adoptz(announce);
+			if B(desirePart(_)){
+				adoptz(announce);
+			}else{
+				adoptz(queue_pc);
+			}
 			+contract(B_CONTRACTOR, in_progress, B_ITEM);
 			-best_offer(B_CONTRACTOR, B_ITEM);
 		}
