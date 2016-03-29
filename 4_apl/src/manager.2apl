@@ -15,14 +15,14 @@ beliefs:
 			'Intel Celeron A',
 			2.0,
 			128,
-			['celeron', 'Pentium 4']
+			unspec
 		),
 		motherboard(
 			intel,
 			'Intel Desktop Board D865PERL',
 			'Intel 865PE',
 			atx,
-			unspec,
+			['celeron', 'Pentium 4'],
 			unspec
 		),
 		graphic_card(
