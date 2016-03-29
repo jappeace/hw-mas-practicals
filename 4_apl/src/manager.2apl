@@ -183,3 +183,6 @@ pcrules:
 			+wtf(CONTRACTOR, ITEM);
 		}
 	}
+	message(CONTRACTOR,inform,La,On,whatisthis(NUMBER)) <- true | {
+		send(CONTRACTOR, inform, whatisthisResponse(num, NUMBER));
+	}

@@ -10,10 +10,18 @@ beliefupdates:
 pgrules:
 	makePart <- duration(TIME) and construct(CONST_TIME, PART) | {
 		if B(TIME > CONST_TIME) {
-			-duration(TIME);
-			-construct(CONST_TIME,PART);
-			send(manager,inform,finished(PART));
-			dropgoal(makePart);
+			if B(crucialInformation(ANWSER,QUESTION)){
+				%using crucial information
+				-crucialInformation(ANWSER,QUESTION);
+			}else{
+				-duration(TIME);
+				-construct(CONST_TIME,PART);
+				send(manager,inform,finished(PART));
+				dropgoal(makePart);
+			}
+		}else if B(rem(TIME, 4) < 1){
+			send(manager,inform,whatisthis(TIME));
+			Wait();
 		}else{
 			Wait();
 		}
@@ -191,6 +199,9 @@ pcrules:
 		+duration(0);
 		+construct(40, PART);
 		adoptz(makePart);
+	}
+	message( manager, inform, La, On, whatisthisResponse(ANWSER,QUESTION)) <- true | {
+		+crucialInformation(ANWSER,QUESTION);
 	}
 
 	sendresponse(ISACEPTED, ITEM) <- requirement(_) | {
