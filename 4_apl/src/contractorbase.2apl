@@ -167,6 +167,7 @@ pcrules:
  	    +requirement(SPEC);
     }
 	%remember, keep your code DRY!
+	% If we won a bid, we sold it, so we can remove the component
 	message( manager, inform, La, On, part(pc_case(MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR,PRICE))) <- true | {
 		-pc_case(MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR,PRICE);
 	}
