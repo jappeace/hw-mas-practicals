@@ -1,4 +1,3 @@
-%TODO: use pc's intead of compontens
 beliefs:
 	wants([
 		pc_case(
@@ -59,8 +58,10 @@ pgrules:
 
 			adoptz(wait);
 			+waiting(0);
+		}else{
+			-wants([]);
+			dropgoal(announce);
 		}
-
     }
 
 	wait <- waiting(TIME) | {
@@ -106,6 +107,9 @@ pgrules:
 				% If we found a better one reject the previous best
 				-best_offer(B_CONTRACTOR, B_ITEM);
 				+best_offer(CONTRACTOR, ITEM);
+				send(B_CONTRACTOR,refuse,part(B_ITEM));
+			}else{
+				send(CONTRACTOR,refuse,part(ITEM));
 			}
 		}else{
 			+best_offer(CONTRACTOR, ITEM);

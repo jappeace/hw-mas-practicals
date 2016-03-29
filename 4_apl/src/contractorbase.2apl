@@ -6,6 +6,7 @@ beliefupdates:
 
 pgrules:
     match <- requirement(SPEC) | {
+		%TODO: re add searching trough the believe base...
         % get the requirement from the manager agent in SPEC
         % and assign the parameter to varibles
 	    if B(SPEC = pc_case(MANUF,TYPE,SHAPE,ATX,POWER,COL,SUITFOR)) {
