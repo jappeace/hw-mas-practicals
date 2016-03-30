@@ -1,0 +1,25 @@
+develop a distributed application that makes use of the Contract-Net Protocol
+
+///// Exercise: Give a detailed specification of one cycle of the contract-net protocol for computer hardware configuration. Specify the process, the message types 
+///// and  the possible content of messages. The content of messages depends on how computers and components are specified (see below for details). This can be written
+/////  out and submitted in a simple .txt file. 
+
+
+A complete cycle:
+
+A node that generates a task advertises the existence of that task to other nodes in the net with a task announcement. This node now becomes the manager for the duration of of this task.
+
+* Does the manager has knowledge of other nodes?					TASK ANNOUNCEMENT
+	if yes then
+		does he know a specific node to give the assignment to?
+			if yes then --> point-to-point assignement
+			else limited broadcast
+	else: general broadcast
+	
+*Other nodes receive a broadcast. Is the agent eligible?				TASK ANNOUNCMENT PROCESSING
+	compare announcement with their specific hardware and software resources
+	if yes then store details and place bid
+	elsea send negative feedback
+	
+				
+*Set bid deadline
