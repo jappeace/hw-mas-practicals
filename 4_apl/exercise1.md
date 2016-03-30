@@ -1,11 +1,11 @@
 ## Exercise 1
 
-*Give a detailed specification of one cycle of the contract-net protocol for computer hardware configuration. Specify the process, the message types and the possible content of messages. The content of messages depends on how computers and components are specified.*
+<sub>*Give a detailed specification of one cycle of the contract-net protocol for computer hardware configuration. Specify the process, the message types and the possible content of messages. The content of messages depends on how computers and components are specified.*</sub>
 
 ### Specification
 
 In a cycle of the contract-net protocol a node generates a task, after which he advertises that task to other nodes in the net with a **task
-announcement**. In our case we already specified the manager, named *manager.2apl*. The other nodes in our setting are called *contractor1.2apl*,
+announcement**. Normally this node becomes the manager, but in our case we already specified the manager, named *manager.2apl*. The other nodes in our setting are called *contractor1.2apl*,
 *contractor2.2apl* and *contractor3.2apl*. Since the manager doesn't have any knowledge of the other nodes beforehand, we let him issue
 a **general broadcast** to all other nodes.
 
@@ -51,7 +51,7 @@ the contractor will ignore it. If the contractor finds a matched item in its bel
 					)
 With all the specified parts and the bid price. If the contractor doens't have a corresponding pc_case, he will send a ```sendresponse(refuse, SPEC).
 
-	### Selection and award message
+### Selection and award message
 Now the manager may receive several bids, and can select the best bid. The best bid in this case is just the cheapest price, so the manager
 can start with the first bid and then moving on to the next, while keep rejecting the worst offer every time. The manager will send
 accept_proposal to the the contractor with the best bid, and reject_proposals to the others.
