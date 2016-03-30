@@ -1,6 +1,6 @@
 ## Exercise 1
 
-Give a detailed specification of one cycle of the contract-net protocol for computer hardware configuration. Specify the process, the message types and the possible content of messages. The content of messages depends on how computers and components are specified.
+*Give a detailed specification of one cycle of the contract-net protocol for computer hardware configuration. Specify the process, the message types and the possible content of messages. The content of messages depends on how computers and components are specified.*
 
 ### Specification
 
