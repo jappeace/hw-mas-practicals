@@ -1,12 +1,13 @@
 package nl.uu.mas.bdyj.valstrat;
 
 import nl.uu.mas.bdyj.Item;
+
 import java.util.Random;
 
-public class RandomValuation extends ANextPriceStrategy{
+public class RandomScaledValuation extends ANextPriceStrategy{
 	Random rand = new Random();
 
-	public RandomValuation(ItemValuation valuationStrategy) {
+	public RandomScaledValuation(ItemValuation valuationStrategy) {
 		super(valuationStrategy);
 	}
 
@@ -16,7 +17,7 @@ public class RandomValuation extends ANextPriceStrategy{
 		if(currentPrice > myValuation){
 			return DONT_WANT;
 		}
-		int newPrice = currentPrice + rand.nextInt(3) + 1;
+		int newPrice = currentPrice + (int)((rand.nextInt(3) + 1)*(0.1*currentPrice));
 		if(newPrice < myValuation){
 			return newPrice;
 		}
