@@ -1,0 +1,187 @@
+beliefs:
+	desired_pc(
+		2,
+		pc_case(
+            unspec,
+            unspec,
+            unspec,
+			unspec,
+            unspec,
+			unspec,
+            unspec
+		),
+		processor(
+			intel,
+			'Intel Celeron A',
+			2.0,
+			128,
+			unspec
+		),
+		motherboard(
+			intel,
+			'Intel Desktop Board D865PERL',
+			'Intel 865PE',
+			atx,
+			['celeron', 'pentium4'],
+			unspec
+		),
+		graphic_card(
+			radeon,
+			'ATI RADEON 7000 Graphics card',
+			'Graphics Card',
+			unspec
+		)
+	).
+	desired_pc(
+		1,
+		pc_case(
+            enlight,
+			'Enlight Server 8902',
+			'tower',
+			atx,
+			300,
+			beige,
+			pc_platform
+		),
+		processor(
+			hp, % yes HP indeed, they make processors now
+			'Hewlett Packard Xeon' ,
+			3.06,
+			512,
+			pc_platform
+		),
+		motherboard(
+			asus, 
+			'Asustek A7N8X Deluxe Motherboard',
+			'NVidia nForce2 SPP', 
+			atx, 
+			unspec, 
+			12.02 * 9.65
+		),
+		graphic_card(
+			'3dlabs',
+			'3Dlabs Oxygen GVX210graphics card',
+			'Multi-monitor Graphics Card',
+			has_processor('3Dlabs Glint R3 graphic processor')
+		)
+	).
+
+	announce :- waiting(_).
+	% , = and, because reasons
+	awardContract :- not offer(_,_) , not best_offer(_,_).
+
+beliefupdates:
+	{waiting(TIME)} Wait() {not waiting(TIME), waiting(TIME+1)}
+
+
+goals:
+	queue_pc.
+
+pgrules:
+	queue_pc <- desired_pc(COUNT,A,B,C,D) | {
+		-desired_pc(COUNT,A,B,C,D);
+		if B(COUNT > 1){
+			+desired_pc(COUNT-1,A,B,C,D);
+		}
+		+desirePart(A);
+		+desirePart(B);
+		+desirePart(C);
+		+desirePart(D);
+		adoptz(announce);
+		dropgoal(queue_pc);
+	}
+    % the manager agent annouce his requierments to all contractor agents 
+    % call for proposal step in C-Net
+    announce <- desirePart(PART) and not offer(_,_) and not best_offer(_,_)| {
+		-desirePart(PART);
+		+requested_part(PART);
+		send(contractor1, cfp, part(PART));
+		send(contractor2, cfp, part(PART));
+		send(contractor3, cfp, part(PART));
+
+		adoptz(wait);
+		+waiting(0);
+    }
+
+	wait <- waiting(TIME) | {
+		if B(TIME > 20) {
+			-waiting(TIME);
+			if B(offer(_,_)){
+				if B(requested_part(PART)){
+					-requested_part(PART);
+				}
+				adoptz(awardContract);
+			}else{
+				if B(requested_part(PART)){
+					+no_offers_for(PART);
+					-requested_part(PART);
+				}
+				if B(desirePart(_)){
+					adoptz(announce);
+				}else{
+					adoptz(queue_pc);
+				}
+			}
+			dropgoal(wait);
+		}else{
+			Wait();
+		}
+	}
+
+
+    % when receive proposals from all contractor agents, then manager agent
+    % then compare the price and pick the cheapest bid
+    % then send the msg with accept_proposal to the contrator agent with cheapest bid
+    % and also send other contractor agents a reject_proposal msg.
+    awardContract <- offer(CONTRACTOR, ITEM) | {
+		if B(best_offer(B_CONTRACTOR,B_ITEM)){
+			% the last var is always the price,
+			% if there were a function that could count subvars in a term
+			% then we can always extract the price. Its called functor, exraction
+			% function is called
+			% this only works because price is always last.
+			B(functor(ITEM, _, VARCOUNT));
+			B(arg(VARCOUNT, ITEM, PRICE));
+			% same extraction procedure for the B item
+			B(functor(B_ITEM, _, B_VARCOUNT));
+			B(arg(B_VARCOUNT, B_ITEM, B_PRICE));
+
+			if B(PRICE < B_PRICE) {
+				% If we found a better one reject the previous best
+				-best_offer(B_CONTRACTOR, B_ITEM);
+				+best_offer(CONTRACTOR, ITEM);
+				send(B_CONTRACTOR,refuse,part(B_ITEM));
+			}else{
+				send(CONTRACTOR,refuse,part(ITEM));
+			}
+		}else{
+			+best_offer(CONTRACTOR, ITEM);
+		}
+		-offer(CONTRACTOR, ITEM);
+		if B((not offer(_,_)) and best_offer(B_CONTRACTOR,B_ITEM)){
+			% ding ding ding, we have a winner!
+			send(B_CONTRACTOR,inform,part(B_ITEM));
+			if B(desirePart(_)){
+				adoptz(announce);
+			}else{
+				adoptz(queue_pc);
+			}
+			+contract(B_CONTRACTOR, in_progress, B_ITEM);
+			-best_offer(B_CONTRACTOR, B_ITEM);
+		}
+    }
+
+pcrules:
+    % receive the proposal from a contractor
+    message(CONTRACTOR,propose,La,On,offer(ITEM)) <- true | {
+		+offer(CONTRACTOR, ITEM);
+    }
+    message(CONTRACTOR,inform,La,On,finished(ITEM)) <- true | {
+		if B(contract(CONTRACTOR, in_progress, ITEM)){
+			-contract(CONTRACTOR, in_progress, ITEM);
+			+contract(CONTRACTOR, finished, ITEM);
+		}
+	}
+	message(CONTRACTOR,inform,La,On,whatisthis(NUMBER)) <- true | {
+		send(CONTRACTOR, inform, whatisthisResponse(num, NUMBER));
+	}

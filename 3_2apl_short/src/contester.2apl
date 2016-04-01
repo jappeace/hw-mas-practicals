@@ -29,22 +29,24 @@ pgrules:
 	B(is(STA,0));
 	send( hally, inform, status(STA));
 	-sent_idle;
-    	B(is(N,0));
-        goto(X, Y, N);
-    	@blockworld( pickup( ), _ );
-    	PickUp();
+	B(is(N,0));
+	goto(X, Y, N);
+	if B(not drop_goto_goal(X,Y)) then {
+		@blockworld( pickup( ), _ );
+		PickUp();
+		@blockworld( senseAllTraps(), TRAPS );
+		det_nearest_bin(TRAPS,X,Y,100,X1,Y1);
+		adopta( clean_dropBomb( blockWorld ));
+		+picked;
+	}
 	-bomb( X, Y );
 	send( hally, inform, bombPicked(X,Y));%send hally to eliminate the bomb from list
 	% detect the nearest trap
-	@blockworld( senseAllTraps(), TRAPS );
-	det_nearest_bin(TRAPS,X,Y,100,X1,Y1);
-	adopta( clean_dropBomb( blockWorld ));
-	+picked;
   }
   
   clean_dropBomb ( blockWorld ) <- picked and trap(X1,Y1) | {
   	B(is(N,0));
-    	goto(X1, Y1, N);
+	goto(X1, Y1, N);
 	@blockworld( drop( ), _ );
 	Drop();
 	-picked;
@@ -52,13 +54,13 @@ pgrules:
   
   knowtrap <- worldSize(W,H) |
   {
-    @blockworld( senseAllTraps(), TRAPS );
-    if B( TRAPS = [[default,X1,Y1] | REST]) {
-      det_nearest_bin(TRAPS,8,8,100,0,0);
-      +knowtrap_done;
-      adopta( clean( blockWorld));
-      dropgoal(knowtrap);
-      }
+	@blockworld( senseAllTraps(), TRAPS );
+	if B( TRAPS = [[default,X1,Y1] | REST]) {
+		det_nearest_bin(TRAPS,8,8,100,0,0);
+		+knowtrap_done;
+		adopta( clean( blockWorld));
+		dropgoal(knowtrap);
+	}
   }
 
 	follow <- knowtrap and clean( blockWorld ) |

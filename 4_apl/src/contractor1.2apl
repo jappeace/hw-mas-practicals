@@ -1,0 +1,4 @@
+include: contractorbase.2apl;
+
+beliefs:
+	include: components1.pl;
