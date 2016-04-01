@@ -62,7 +62,7 @@ class Main{
 		}
 	}
 	public static void startContainer(jade.wrapper.AgentContainer container) throws StaleProxyException {
-		container.acceptNewAgent("timmy"+i, new BidAgent(100, new RandomValuation()));
+		container.acceptNewAgent("timmy", new BidAgent(100, new RandomValuation()));
 		List<Item> items = new LinkedList<Item>();
 		items.add(new Item("blah"));
 		container.acceptNewAgent("leo", new ActioneerAgent(items));
