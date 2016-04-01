@@ -17,7 +17,7 @@ public class RandomScaledValuation extends ANextPriceStrategy{
 		if(currentPrice > myValuation){
 			return DONT_WANT;
 		}
-		int newPrice = currentPrice + (int)((rand.nextInt(3) + 1)*(0.1*currentPrice));
+		int newPrice = currentPrice + (int)(rand.nextInt(3)*(0.1*currentPrice))+ 1;
 		if(newPrice < myValuation){
 			return newPrice;
 		}
