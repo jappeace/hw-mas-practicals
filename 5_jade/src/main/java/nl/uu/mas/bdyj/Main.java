@@ -5,6 +5,7 @@ import jade.core.*;
 import jade.core.Runtime;
 import jade.util.leap.Properties;
 import jade.wrapper.StaleProxyException;
+import nl.uu.mas.bdyj.valstrat.RandomValuation;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -61,7 +62,7 @@ class Main{
 		}
 	}
 	public static void startContainer(jade.wrapper.AgentContainer container) throws StaleProxyException {
-		container.acceptNewAgent("timmy", new BidAgent(100));
+		container.acceptNewAgent("timmy"+i, new BidAgent(100, new RandomValuation()));
 		List<Item> items = new LinkedList<Item>();
 		items.add(new Item("blah"));
 		container.acceptNewAgent("leo", new ActioneerAgent(items));
