@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import java.util.LinkedList;
 import java.util.List;
 
+import java.util.Random;
 class Main{
 	private static final Logger log = LoggerFactory.getLogger(Main.class);
 	public static void main(String[] argsb) {
@@ -23,7 +24,8 @@ class Main{
 				log.info("agent reporting");
 			}
 		};
-		String[] args = "-gui -local-port 1100".split(" ");
+		int port = new Random().nextInt(100)+1000;
+		String[] args = ("-gui -local-port "+port).split(" ");
 		try {
 			ProfileImpl iae = null;
 			if(args.length > 0) {
