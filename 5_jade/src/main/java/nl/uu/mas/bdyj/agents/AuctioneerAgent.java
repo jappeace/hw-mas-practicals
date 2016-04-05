@@ -1,4 +1,4 @@
-package nl.uu.mas.bdyj;
+package nl.uu.mas.bdyj.agents;
 
 import jade.core.Agent;
 
@@ -37,10 +37,11 @@ public class AuctioneerAgent extends Agent{
 	boolean closeAuction = false;
 	protected void setup() {
 		System.out.println("Hello! AuctioneerAgent " + getAID().getLocalName() + " is ready.");
+		final Agent a = this;
 		// start the auction, delay 2000ms to wait all bidder agents start
 		addBehaviour(new WakerBehaviour(this, 2000) {
 			protected void handleElapsedTimeout() {
-				addBehaviour(new SendPrice());
+				addBehaviour(new SendPrice(a, 1000L));
 				addBehaviour(new ReceiveBid());
 				addBehaviour(new CloseAuction());
 			}
@@ -63,11 +64,17 @@ public class AuctioneerAgent extends Agent{
 	 * behaviour for acutioneer to announce the latest higest price
 	 * to every bidder which are still in the acution 
 	 */
-	private class SendPrice extends CyclicBehaviour {
-		public void action() {
+	private class SendPrice extends TickerBehaviour{
+		SendPrice(Agent a, long period){
+			super(a,period);
+		}
+
+		@Override
+		protected void onTick() {
+
 			AID bidderAgents[] = new AID[5];
 			int numOfBidder = 0;
-			
+
 			if (getNewPrice == true) {
 				getNewPrice = false;
 				// Update the list of Bidder agents which still in
@@ -76,7 +83,7 @@ public class AuctioneerAgent extends Agent{
 				sd.setType(auctionGood);
 				template.addServices(sd);
 				try {
-					DFAgentDescription[] result = DFService.search(myAgent, template); 
+					DFAgentDescription[] result = DFService.search(myAgent, template);
 					System.out.println("****************************************************");
 					System.out.println("[" + getAID().getLocalName() + "] Found the following Bidder agents are still in the acution:");
 					numOfBidder = result.length;
@@ -106,6 +113,7 @@ public class AuctioneerAgent extends Agent{
 			else {
 				block(1);
 			}
+
 		}
 	}
 	/*

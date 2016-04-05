@@ -5,6 +5,8 @@ import jade.core.*;
 import jade.core.Runtime;
 import jade.util.leap.Properties;
 import jade.wrapper.StaleProxyException;
+import nl.uu.mas.bdyj.agents.AuctioneerAgent;
+import nl.uu.mas.bdyj.agents.BidderAgent;
 import nl.uu.mas.bdyj.valstrat.ConstantItemValuation;
 import nl.uu.mas.bdyj.valstrat.RandomScaledValuation;
 import nl.uu.mas.bdyj.valstrat.RandomValuation;
