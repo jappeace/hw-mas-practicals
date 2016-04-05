@@ -7,6 +7,8 @@ import jade.util.leap.Properties;
 import jade.wrapper.StaleProxyException;
 import nl.uu.mas.bdyj.agents.AuctioneerAgent;
 import nl.uu.mas.bdyj.agents.BidderAgent;
+import nl.uu.mas.bdyj.agents.AuctioneerAgentDutch;
+import nl.uu.mas.bdyj.agents.BidderAgentDutch;
 import nl.uu.mas.bdyj.valstrat.ConstantItemValuation;
 import nl.uu.mas.bdyj.valstrat.RandomScaledValuation;
 import nl.uu.mas.bdyj.valstrat.RandomValuation;
@@ -69,19 +71,20 @@ class Main{
 	}
 	public static void startContainer(jade.wrapper.AgentContainer container) throws StaleProxyException {
 		Item tem = new Item("candy");
-		container.acceptNewAgent("timmy", new BidderAgent(
+		container.acceptNewAgent("timmy", new BidderAgentDutch(
 				new RandomValuation(
 						new ConstantItemValuation(120)
 				), tem)
 		).start();
-		container.acceptNewAgent("hendrik", new BidderAgent(
+		container.acceptNewAgent("hendrik", new BidderAgentDutch(
 				new RandomScaledValuation(
 						new ConstantItemValuation(100)
 				), tem)
 		).start();
 		List<Item> items = new LinkedList<Item>();
 		items.add(new Item("blah"));
-		container.acceptNewAgent("leo", new AuctioneerAgent(10,"candy")).start();
+		//container.acceptNewAgent("leo", new AuctioneerAgent(10,"candy")).start();
+		container.acceptNewAgent("leo", new AuctioneerAgentDutch(160,"candy")).start();
 	}
 
 }
