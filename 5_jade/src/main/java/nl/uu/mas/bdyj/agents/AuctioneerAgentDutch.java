@@ -132,7 +132,7 @@ public class AuctioneerAgentDutch extends Agent {
 			MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.PROPOSE),
 					MessageTemplate.MatchConversationId(auctionGood));
 			ACLMessage msg = myAgent.receive(mt);
-			if (msg != null) {
+			if (msg != null && !existBid) {
 				// PROPOSE Message received. Process it
 				// receivePrice is the price received from any bidder agents
 				int receivedPrice = Integer.valueOf(msg.getContent());
@@ -141,11 +141,10 @@ public class AuctioneerAgentDutch extends Agent {
 				// If the received price is higher than last highest price, then update it
 				// as the latest highest price
 				if (receivedPrice == currentPrice) {
-					currentPrice = receivedPrice;
 					currentBidder = sender;
 					currentBidderAid = msg.getSender();
 					System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++");
-					System.out.println("The auctioneer announces that the latest highest price is " + msg.getContent());
+					System.out.println("The auctioneer announces that the bid price is " + msg.getContent());
 					System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++");
 					System.out.println("");
 					existBid = true;
@@ -196,8 +195,8 @@ public class AuctioneerAgentDutch extends Agent {
 					cfp.setConversationId(auctionGood);
 					cfp.setReplyWith("cfp" + System.currentTimeMillis()); // Unique value
 					myAgent.send(cfp);
-					myAgent.doDelete();
 				}
+				myAgent.doDelete();
 			}
 		}
 	}
