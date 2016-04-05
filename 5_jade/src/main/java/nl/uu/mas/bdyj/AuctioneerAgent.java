@@ -15,6 +15,11 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 
 
 public class AuctioneerAgent extends Agent{
+	public AuctioneerAgent(float startingPrice, String auctionGood){
+		this.auctionGood = auctionGood;
+		this.startingPrice = startingPrice;
+		currentPrice = startingPrice;
+	}
 	// agent initializations
 	// the auctioneer will send the latest price to every bidder agents when getNewPrice is asserted
 	// set the initial value of getNewPrice to true to make the auctioneer agent send out the starting price
@@ -30,33 +35,20 @@ public class AuctioneerAgent extends Agent{
 	boolean closeAuction = false;
 	protected void setup() {
 		System.out.println("Hello! AuctioneerAgent " + getAID().getLocalName() + " is ready.");
-		// get the arguments
-		Object[] args = getArguments();
-		if ((args != null) && (args.length > 0)) {
-			auctionGood = (String) args[0];
-			startingPrice = Float.valueOf((String)args[1]);
-			currentPrice = startingPrice;
-			System.out.println("The auction good is " + (String) args[0]+ ", and the starting price is " + (String)args[1]);
-			// start the auction, delay 2000ms to wait all bidder agents start
-			addBehaviour(new WakerBehaviour(this, 2000) {
-				protected void handleElapsedTimeout() {
-					addBehaviour(new SendPrice());
-					addBehaviour(new ReceiveBid());
-					addBehaviour(new CloseAuction());
-				}
-			});
-			addBehaviour(new TickerBehaviour(this, 1000) {
-				protected void onTick() {
-					timer = timer + 1;
-					System.out.println("timer = " + String.valueOf(timer));
-				}
-			});
-		}
-		else {
-			System.out.println("Invaild arguments for AuctioneerAgent, please set the auction good for AuctioneerAgent");
-			doDelete();
-		}
-		
+		// start the auction, delay 2000ms to wait all bidder agents start
+		addBehaviour(new WakerBehaviour(this, 2000) {
+			protected void handleElapsedTimeout() {
+				addBehaviour(new SendPrice());
+				addBehaviour(new ReceiveBid());
+				addBehaviour(new CloseAuction());
+			}
+		});
+		addBehaviour(new TickerBehaviour(this, 1000) {
+			protected void onTick() {
+				timer = timer + 1;
+				System.out.println("timer = " + String.valueOf(timer));
+			}
+		});
 	}
 	
 	// Put agent clean-up operations here

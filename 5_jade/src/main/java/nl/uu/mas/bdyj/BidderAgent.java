@@ -16,6 +16,10 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 
 
 public class BidderAgent extends Agent{
+	public BidderAgent(float valuation, String auctionGood){
+		this.valuation = valuation;
+		this.auctionGood = auctionGood;
+	}
 	// agent initializations
 	float valuation;
 	String auctionGood;
@@ -23,35 +27,21 @@ public class BidderAgent extends Agent{
 	float currentBidPrice = 0;
 	protected void setup() {
 		System.out.println("Hello! BidderAgent " + getAID().getLocalName() + " is ready.");
-		// get the arguments
-		Object[] args = getArguments();
-		if ((args != null) && (args.length > 0)) {
-			auctionGood = (String) args[0];
-			valuation = Float.valueOf((String) args[1]);
-			System.out.println(getAID().getLocalName() + " want to bid " + args[0]);
-			System.out.println("The valuation of the " + args[0] +" for "  + getAID().getLocalName() + " is " + (String) args[1]);
-			// Register the book-selling service in the yellow pages
-			String auctionGood = (String) getArguments()[0];
-			DFAgentDescription dfd = new DFAgentDescription();
-			ServiceDescription sd = new ServiceDescription();
-			sd.setType(auctionGood);
-			sd.setName("JADE-Auction");
-			dfd.setName(getAID());
-			dfd.addServices(sd);
-			try {
-				DFService.register(this, dfd);
-			}
-			catch (FIPAException fe) {
-				fe.printStackTrace();
-			}
-			addBehaviour(new OfferBid());
-			addBehaviour(new WinBid());
-			
+		DFAgentDescription dfd = new DFAgentDescription();
+		ServiceDescription sd = new ServiceDescription();
+		sd.setType(auctionGood);
+		sd.setName("JADE-Auction");
+		dfd.setName(getAID());
+		dfd.addServices(sd);
+		try {
+			DFService.register(this, dfd);
 		}
-		else {
-			System.out.println("Invaild arguments for BidAgent, please set the valuation value for BidAgent");
-			doDelete();
-		}	
+		catch (FIPAException fe) {
+			fe.printStackTrace();
+		}
+		addBehaviour(new OfferBid());
+		addBehaviour(new WinBid());
+
 	}
 	
 	// Put agent clean-up operations here
