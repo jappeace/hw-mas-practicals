@@ -84,7 +84,7 @@ class Main{
 		List<Item> items = new LinkedList<Item>();
 		items.add(new Item("blah"));
 		//container.acceptNewAgent("leo", new AuctioneerAgent(10,"candy")).start();
-		container.acceptNewAgent("leo", new AuctioneerAgentDutch(160,"candy")).start();
+		container.acceptNewAgent("leo", new AuctioneerAgentDutch(160,"candy",3)).start();
 	}
 
 }

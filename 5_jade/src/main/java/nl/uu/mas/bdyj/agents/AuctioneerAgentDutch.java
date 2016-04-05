@@ -14,9 +14,10 @@ import jade.lang.acl.MessageTemplate;
 
 
 public class AuctioneerAgentDutch extends Agent {
-	public AuctioneerAgentDutch(int startingPrice, String auctionGood) {
+	public AuctioneerAgentDutch(int startingPrice, String auctionGood,int minIncrement) {
 		this.auctionGood = auctionGood;
 		this.startingPrice = startingPrice;
+		this.minIncrement = minIncrement;
 		currentPrice = startingPrice;
 	}
 
@@ -33,7 +34,7 @@ public class AuctioneerAgentDutch extends Agent {
 	AID currentBidderAid;
 	int timer = 0;
 	boolean closeAuction = false;
-	int minIncrement = 3;
+	int minIncrement;
 
 	protected void setup() {
 		System.out.println("Hello! AuctioneerAgent " + getAID().getLocalName() + " is ready.");
