@@ -2,6 +2,8 @@ package nl.uu.mas.bdyj;
 
 import jade.core.Agent;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Timer;
 
 import jade.core.AID;
@@ -15,7 +17,7 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 
 
 public class AuctioneerAgent extends Agent{
-	public AuctioneerAgent(float startingPrice, String auctionGood){
+	public AuctioneerAgent(int startingPrice, String auctionGood){
 		this.auctionGood = auctionGood;
 		this.startingPrice = startingPrice;
 		currentPrice = startingPrice;
@@ -27,8 +29,8 @@ public class AuctioneerAgent extends Agent{
 	// be set to true after receiving a new price which is higher than current price from any bidder agents
 	private boolean getNewPrice = true;
 	String auctionGood;
-	float startingPrice;
-	float currentPrice;
+	int startingPrice;
+	int currentPrice;
 	String currentBidder;
 	AID currentBidderAid;
 	int timer = 0;
@@ -88,8 +90,8 @@ public class AuctioneerAgent extends Agent{
 				catch (FIPAException fe) {
 					fe.printStackTrace();
 				}
-				
-				// Send latest highest price to all bidder agents which are still in	
+
+				// Send latest highest price to all bidder agents which are still in
 				for (int i = 0; i < numOfBidder; i ++) {
 					ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
 					cfp.addReceiver(bidderAgents[i]);
@@ -120,7 +122,7 @@ public class AuctioneerAgent extends Agent{
 				timer = 0;
 				// PROPOSE Message received. Process it
 				// receivePrice is the price received from any bidder agents
-				float receivedPrice = Float.valueOf(msg.getContent());
+				int receivedPrice = Integer.valueOf(msg.getContent());
 				String sender = msg.getSender().getLocalName();
 				
 				// If the received price is higher than last highest price, then update it
@@ -130,7 +132,7 @@ public class AuctioneerAgent extends Agent{
 					currentBidder = sender;
 					currentBidderAid = msg.getSender();
 					System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++");
-					System.out.println("The acutioneer announce that the latest highest price is " + msg.getContent());
+					System.out.println("The auctioneer announces that the latest highest price is " + msg.getContent());
 					System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++");
 					System.out.println("");
 					getNewPrice = true;

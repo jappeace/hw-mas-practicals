@@ -13,23 +13,23 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import nl.uu.mas.bdyj.valstrat.ANextPriceStrategy;
+import nl.uu.mas.bdyj.valstrat.NextPriceStrategy;
 
 
 public class BidderAgent extends Agent{
-	public BidderAgent(float valuation, String auctionGood){
+	public BidderAgent(NextPriceStrategy valuation, Item auctionGood){
 		this.valuation = valuation;
 		this.auctionGood = auctionGood;
 	}
 	// agent initializations
-	float valuation;
-	String auctionGood;
-	// currentBidPrice is the current bid price for each bidder agent
-	float currentBidPrice = 0;
+	NextPriceStrategy valuation;
+	Item auctionGood;
 	protected void setup() {
 		System.out.println("Hello! BidderAgent " + getAID().getLocalName() + " is ready.");
 		DFAgentDescription dfd = new DFAgentDescription();
 		ServiceDescription sd = new ServiceDescription();
-		sd.setType(auctionGood);
+		sd.setType(auctionGood.name);
 		sd.setName("JADE-Auction");
 		dfd.setName(getAID());
 		dfd.addServices(sd);
@@ -60,7 +60,7 @@ public class BidderAgent extends Agent{
 	private class OfferBid extends CyclicBehaviour {
 		public void action() {
 			MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.CFP),
-					                                 MessageTemplate.MatchConversationId(auctionGood));
+					                                 MessageTemplate.MatchConversationId(auctionGood.name));
 			ACLMessage msg = myAgent.receive(mt);
 			if (msg != null) {
 				// CFP Message received. Process it
@@ -69,41 +69,30 @@ public class BidderAgent extends Agent{
 				String msgSplit[] = msgContent.split(" ");
 				// msgSplit[0] is currentBidder and msgSplit[1] is currentPrice
 				String currentBidder = msgSplit[0];
-				float currentPrice = Float.valueOf(msgSplit[1]);
+				int currentPrice = Integer.valueOf(msgSplit[1]);
+				int newval = valuation.decide(auctionGood, currentPrice);
 				// if the latest highest price is larger than the valuation of each bidder agent
 				// then quit the auction and terminate the bidder agent
-				if (currentPrice > valuation) {
+				if (newval  <= ANextPriceStrategy.DONT_WANT) {
 					System.out.println(getAID().getLocalName()+" quit the auction!");
 					System.out.println("");
 					myAgent.doDelete();
+					return;
 				}
 				
 				// if the latet highest price if less than the valuation
 				// and if not given by the bidder agent self
 				// then give a new bid price which is higher than the latest higest price and less than valuation
-				else if (currentBidder.equals(getAID().getLocalName()) == false) {
-					float minIncrement = 3;
-					float tmpPrice =  (float) (currentPrice + minIncrement);
-					if (tmpPrice <= valuation) {
-						currentBidPrice = tmpPrice;
-					}
-					else {
-						currentBidPrice = valuation;
-					}
+				if (!currentBidder.equals(getAID().getLocalName())) {
 					ACLMessage reply = msg.createReply();
 					reply.setPerformative(ACLMessage.PROPOSE);
-					reply.setConversationId(auctionGood);
-					reply.setContent(String.valueOf(currentBidPrice));
+					reply.setConversationId(auctionGood.name);
+					reply.setContent(newval+"");
 					myAgent.send(reply);
 					System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-					System.out.println(getAID().getLocalName() + " cries a higher price: " + String.valueOf(currentBidPrice));
+					System.out.println(getAID().getLocalName() + " cries a higher price: " + newval);
 					System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 					System.out.println("");
-				}
-				// if the latest highest is given by the bidder agent self, then wait to see whether
-				// there are some other bidder agents will give a higer price.
-				else {
-					
 				}
 			}
 			else {
@@ -115,7 +104,7 @@ public class BidderAgent extends Agent{
 	private class WinBid extends CyclicBehaviour {
 		public void action() {
 			MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL),
-                    MessageTemplate.MatchConversationId(auctionGood));
+                    MessageTemplate.MatchConversationId(auctionGood.name));
 			ACLMessage msg = myAgent.receive(mt);
 			if (msg != null) {
 				myAgent.doDelete();
