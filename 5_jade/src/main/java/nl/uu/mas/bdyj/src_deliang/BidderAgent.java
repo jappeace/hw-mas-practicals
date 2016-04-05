@@ -31,7 +31,6 @@ public class BidderAgent extends Agent{
 			System.out.println(getAID().getLocalName() + " want to bid " + args[0]);
 			System.out.println("The valuation of the " + args[0] +" for "  + getAID().getLocalName() + " is " + (String) args[1]);
 			// Register the book-selling service in the yellow pages
-			String auctionGood = (String) getArguments()[0];
 			DFAgentDescription dfd = new DFAgentDescription();
 			ServiceDescription sd = new ServiceDescription();
 			sd.setType(auctionGood);
@@ -44,7 +43,14 @@ public class BidderAgent extends Agent{
 			catch (FIPAException fe) {
 				fe.printStackTrace();
 			}
-			addBehaviour(new OfferBid());
+			
+			int period = 2000 + new Random().nextInt(2000);
+			addBehaviour(new TickerBehaviour(this,1000) {
+				protected void onTick() {
+					addBehaviour(new OfferBid());
+				}
+			});
+			
 			addBehaviour(new WinBid());
 			
 		}
@@ -64,10 +70,10 @@ public class BidderAgent extends Agent{
 			fe.printStackTrace();
 		}
 		// Printout a dismissal message
-		System.out.println("BidAgent "+getAID().getLocalName()+" terminating.");
+		System.out.println("BidderAgent "+getAID().getLocalName()+" terminating.");
 	}
 	
-	private class OfferBid extends CyclicBehaviour {
+	private class OfferBid extends Behaviour {
 		public void action() {
 			MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.CFP),
 					                                 MessageTemplate.MatchConversationId(auctionGood));
@@ -80,6 +86,8 @@ public class BidderAgent extends Agent{
 				// msgSplit[0] is currentBidder and msgSplit[1] is currentPrice
 				String currentBidder = msgSplit[0];
 				float currentPrice = Float.valueOf(msgSplit[1]);
+				String time = msg.getReplyWith();
+				long time_local = System.currentTimeMillis();
 				// if the latest highest price is larger than the valuation of each bidder agent
 				// then quit the auction and terminate the bidder agent
 				if (currentPrice > valuation) {
@@ -92,7 +100,9 @@ public class BidderAgent extends Agent{
 				// and if not given by the bidder agent self
 				// then give a new bid price which is higher than the latest higest price and less than valuation
 				else if (currentBidder.equals(getAID().getLocalName()) == false) {
+					
 					float minIncrement = 3;
+					
 					float tmpPrice =  (float) (currentPrice + minIncrement);
 					if (tmpPrice <= valuation) {
 						currentBidPrice = tmpPrice;
@@ -100,6 +110,16 @@ public class BidderAgent extends Agent{
 					else {
 						currentBidPrice = valuation;
 					}
+					
+					//float increament;
+					//if ((valuation - currentPrice)*0.1 > minIncrement) {
+					//	increament = (float) ((valuation - currentPrice)*0.1);
+					//}
+					//else {
+					//	increament = minIncrement;
+					//}
+					//currentBidPrice = currentPrice + increament;
+					
 					ACLMessage reply = msg.createReply();
 					reply.setPerformative(ACLMessage.PROPOSE);
 					reply.setConversationId(auctionGood);
@@ -113,12 +133,17 @@ public class BidderAgent extends Agent{
 				// if the latest highest is given by the bidder agent self, then wait to see whether
 				// there are some other bidder agents will give a higer price.
 				else {
-					
 				}
 			}
 			else {
-				block(5000);
+				block(1);
 			}
+		}
+
+		@Override
+		public boolean done() {
+			// TODO Auto-generated method stub
+			return false;
 		}
 	}
 	
