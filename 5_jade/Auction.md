@@ -21,6 +21,7 @@ we defined 3 behaviours for auctioneer agent:
 * SendPrice
 * ReceiveBid
 * CloseAuction
+
 ##### SendPrice
 The behaviour SendPrice will be acted at 2 situation:
 - The auctioneer announce the starting price at the beginning of the auction;
