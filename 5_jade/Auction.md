@@ -1,5 +1,5 @@
- #  MAS -- Exercise: Auction
- ## 1. Team member information
+#  MAS -- Exercise: Auction
+## 1. Team member information
 ```sh
 StudentName        StudentNo 
 Jappie Klooster    5771803
@@ -33,11 +33,11 @@ The Auction will be closed at following 2 situations:
 - No bid was given in a specific period after the auctioneer announce the starting price, that means no bidder agent want to buy the auction good with a price equal or higher than the starting price, then the auction will be closed as conflict deal;
 - There is no new bid was given after a specific period of lastest higest price, then the auction will be closed, the auction good will be sold to the bidder agent with the higest price.
 
- #### 2.1.2 Bidder Agents
+#### 2.1.2 Bidder Agents
  We defined 2 behaviours for bidde agents:
  * OfferBid
  * WinBid
- ##### OfferBid
+##### OfferBid
 In the OfferBid behaviour, the bidder agents receive the latest highest price from other bidder agents(transftered by auctioneer agent), and decide whether to give a higher price or quit the auction according to their own price strategy and the valuation of the auction good. 
 
 If the latest highest price is lager than the valuation of the bidder agent, then the bidder agent would choise to quit the auction， else we defined 3 price strategies for bidder agents to give a new higher price: 
