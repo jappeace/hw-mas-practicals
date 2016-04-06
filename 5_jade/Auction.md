@@ -53,3 +53,59 @@ The price strategy was specified when the bidder agent was borned. The last two 
 
 ##### WinBid
 In this Behaviour, if the bidder agent receive a message from auctioneer agents which accept her bid, then the bidder agent knows she win the bid and then finish and quit the auction.
+
+
+
+### 2.2 Dutch auction
+In dutch auction, the auctioneer agent has one auction good to sell with a highest specific starting price, if there is a bidder agent want to buy the good, the auction will come to a deal at once and then close. Else, the auctioneer will decrease the price with a constant value each time, until a bidder agent want to buy the good, the auction will come to a deal at once and then close. All agents quit the auction when it is closed. 
+##### Interactions between Autioneer Agent and Bidder Agents in the Dutch auction
+*	Auctioneer agent announce the starting price to every bidder agents in the auction, then decrease the price with a constant value at each round, until he receives a bid and sell it to the first bidder.
+*	If a bidder think the current price announced by auctioneer is acceptable, then he send a bid. If 2 bids received at the same round then only the first one is accepted.
+*	The auction will be closed when there is a bid.
+
+#### 2.2.1 Auctioneer Agent
+The structure is the same as in English auction, we defined 3 behaviours for auctioneer agent:
+* SendPrice
+* ReceiveBid
+* CloseAuction
+
+The following part would discuss the difference with regard to English auction.(that is, what we have changed based on English auction to implement Dutch auction)
+
+##### SendPrice
+- SendPrice at every round (1 second), no need to check if there is a new price (in English auction the auctioneer only SendPrice when there is a new highest bid price)
+- At starting of SendPrice it decreases the current price for the current round.
+- Only send price, no information for current bidder.
+
+##### ReceiveBid
+- Add if-condition for ReceiveBid: only when there is no former bid. (to avoid accepting 2 bids in a round)
+- In English auction it updates the current price to the value of bid price if the bid price is higher. But here the process is not needed.
+- Set logical indicator 'existBid' to be true. (instead in english auction it is logical indicator for if auctioneer get a new price)
+- Timer is removed. It is not needed. 
+
+
+##### CloseAuction
+- In English auction the executing condition for CloseAuction is timer > 5. Here we only need to judge if existBid is true.
+- Send bid-accepted message to every bidder(in English auction only send to the winner).
+
+
+#### 2.2.2 Bidder Agents
+The structure is the similar to English auction We defined 2 behaviours for bidder agents:
+ * OfferBid
+ * EndBid
+ 
+Different to English auction, we use EndBid instead of WinBid.
+
+The following part would discuss the difference with regard to English auction.(that is, what we have changed based on English auction to implement Dutch auction)
+
+##### OfferBid
+
+- Only receive current price, no information for current bidder.
+- Here bidder doesn't quit when the price is higher than valuation. (quiting function is moved to EndBid for all bidders)
+- if the current price is acceptable, then send a bid. (In english auction the condition is if the bidder doesn't quit and the current bidder is not himself. Both of them are not applicable here.)
+
+
+##### EndBid
+
+-When received ACCEPT_PROPOSAL message, all bidders quit.
+
+
