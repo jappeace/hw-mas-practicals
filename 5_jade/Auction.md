@@ -27,8 +27,10 @@ The behaviour SendPrice will be acted at 2 situation:
 - The auctioneer announce the starting price at the beginning of the auction;
 - The auctionner received a new higher price for any bidder angent and announce the new price to all bidder agents. (Acutally, it is not needed for real English Auction due to the fact that the English Auction is opencry, every bidder agents can hear the price from any other bidder agents, but in our implementation, to make it simple and compatable with Sealed-Bid Auction, we just ask the auctioneer to transfer the current higher price to any other bidder angets to mimic the opencry).
 In this behaviours, the auctioneer will check all bidder agents who still in the auction via the yellow page agent, and send the current highest price to those bidder agents who still in the acution.
+
 ##### ReceiveBid
 The behaviour ReceiveBid is used for auctioneer to continuously monitor the higer price compared with the current price, if there is a higher price for any bidder agent, then this behaviour will assert getNewPrice and trigger the behaviour SendPrice to send the latest highest price to all bidder agents. 
+
 ##### CloseAuction
 The Auction will be closed at following 2 situations:
 - No bid was given in a specific period after the auctioneer announce the starting price, that means no bidder agent want to buy the auction good with a price equal or higher than the starting price, then the auction will be closed as conflict deal;
