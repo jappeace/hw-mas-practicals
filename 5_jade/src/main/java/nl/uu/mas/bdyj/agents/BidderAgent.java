@@ -55,7 +55,7 @@ public class BidderAgent extends Agent{
 			fe.printStackTrace();
 		}
 		// Printout a dismissal message
-		System.out.println("BidAgent "+getAID().getLocalName()+" terminating.");
+		System.out.println("BidderAgent "+getAID().getLocalName()+" terminating.");
 	}
 	
 	private class OfferBid extends CyclicBehaviour {

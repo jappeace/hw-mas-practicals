@@ -37,12 +37,6 @@ public class AuctioneerAgent extends Agent {
 	protected void setup() {
 		System.out.println("Hello! AuctioneerAgent " + getAID().getLocalName() + " is ready.");
 		final Agent a = this;
-		addBehaviour(new TickerBehaviour(this, 1000) {
-			protected void onTick() {
-				timer = timer + 1;
-				System.out.println("timer = " + String.valueOf(timer));
-			}
-		});
 
 		addBehaviour(new SendPrice(this, 1000));
 
@@ -101,7 +95,8 @@ public class AuctioneerAgent extends Agent {
 					}
 					System.out.println("****************************************************");
 					System.out.println("");
-				} catch (FIPAException fe) {
+				}
+				catch (FIPAException fe) {
 					fe.printStackTrace();
 				}
 
@@ -116,7 +111,8 @@ public class AuctioneerAgent extends Agent {
 					cfp.setReplyWith("cfp" + System.currentTimeMillis()); // Unique value
 					myAgent.send(cfp);
 				}
-			} else {
+			} 
+			else {
 				block(1);
 			}
 
@@ -147,7 +143,7 @@ public class AuctioneerAgent extends Agent {
 					currentBidder = sender;
 					currentBidderAid = msg.getSender();
 					System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++");
-					System.out.println("The auctioneer announces that the latest highest price is " + msg.getContent());
+					System.out.println("The auctioneer announces that the latest highest price is " + msg.getContent() + " from " + currentBidder);
 					System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++");
 					System.out.println("");
 					getNewPrice = true;
