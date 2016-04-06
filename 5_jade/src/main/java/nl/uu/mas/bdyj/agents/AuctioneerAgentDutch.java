@@ -32,19 +32,12 @@ public class AuctioneerAgentDutch extends Agent {
 	int currentPrice;
 	String currentBidder;
 	AID currentBidderAid;
-	int timer = 0;
 	boolean closeAuction = false;
 	int minIncrement;
 
 	protected void setup() {
 		System.out.println("Hello! AuctioneerAgent " + getAID().getLocalName() + " is ready.");
 		final Agent a = this;
-		addBehaviour(new TickerBehaviour(this, 1000) {
-			protected void onTick() {
-				timer = timer + 1;
-				System.out.println("timer = " + String.valueOf(timer));
-			}
-		});
 
 		addBehaviour(new SendPrice(this, 1000));
 
@@ -55,7 +48,6 @@ public class AuctioneerAgentDutch extends Agent {
 				addBehaviour(new CloseAuction());
 			}
 		});
-
 	}
 
 	// Put agent clean-up operations here
@@ -65,8 +57,8 @@ public class AuctioneerAgentDutch extends Agent {
 	}
 
 	/*
-	 * behaviour for acutioneer to announce the latest higest price
-	 * to every bidder which are still in the acution 
+	 * behaviour for acutioneer to announce the current price
+	 * to every bidder
 	 */
 	private class SendPrice extends TickerBehaviour {
 		SendPrice(Agent a, long period) {
@@ -80,8 +72,6 @@ public class AuctioneerAgentDutch extends Agent {
 			int numOfBidder = 0;
 
 			if (!existBid) {
-				// clear the timer;
-				timer = 0;
 				currentPrice = currentPrice - minIncrement;
 				System.out.println("****************************************************");
 				System.out.println("Now the price is: " + String.valueOf(currentPrice));
@@ -105,12 +95,10 @@ public class AuctioneerAgentDutch extends Agent {
 					fe.printStackTrace();
 				}
 
-				// Send latest highest price to all bidder agents which are still in
+				// Send current price to all bidder agents which are still in
 				for (int i = 0; i < numOfBidder; i++) {
 					ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
 					cfp.addReceiver(bidderAgents[i]);
-					// content is the latest highest price and the local name of the bidder who cried this price
-					// format is localName + " " + currentPrice
 					cfp.setContent(String.valueOf(currentPrice));
 					cfp.setConversationId(auctionGood);
 					cfp.setReplyWith("cfp" + System.currentTimeMillis()); // Unique value
@@ -163,7 +151,7 @@ public class AuctioneerAgentDutch extends Agent {
 		public void action() {
 			// if there is no new bid receive in 5s, then award the acution good to the
 			// bidder with latest highest price.
-			if (timer >= 5) {
+			if (existBid) {
 				closeAuction = true;
 				System.out.println(" ");
 				System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
@@ -171,10 +159,7 @@ public class AuctioneerAgentDutch extends Agent {
 				System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 				System.out.println(" ");
 
-
-
-
-				// Update the list of Bidder agents which still in
+				// Update the list of Bidder agents
 				AID bidderAgents[] = new AID[5];
 				int numOfBidder = 0;
 				DFAgentDescription template = new DFAgentDescription();
@@ -188,12 +173,13 @@ public class AuctioneerAgentDutch extends Agent {
 					fe.printStackTrace();
 				}
 
+				//send msg to all bidders
 				for (int i = 0; i < numOfBidder; i++) {
 					ACLMessage cfp = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
 					cfp.addReceiver(bidderAgents[i]);
 					cfp.setContent(String.valueOf(currentPrice));
 					cfp.setConversationId(auctionGood);
-					cfp.setReplyWith("cfp" + System.currentTimeMillis()); // Unique value
+					cfp.setReplyWith("cfp" + System.currentTimeMillis()); 
 					myAgent.send(cfp);
 				}
 				myAgent.doDelete();

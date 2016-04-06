@@ -64,12 +64,11 @@ public class BidderAgentDutch extends Agent{
 					                                 MessageTemplate.MatchConversationId(auctionGood.name));
 			ACLMessage msg = myAgent.receive(mt);
 			if (msg != null) {
-				// CFP Message received. Process it
-				// currentPrice is the latest higest price from all bidder agents
+				// CFP Message received. Get current price from it
 				int currentPrice = Integer.valueOf(msg.getContent());
 				int newval = valuation.decide(auctionGood, currentPrice);
-				// if the latest highest price is larger than the valuation of each bidder agent
-				// then quit the auction and terminate the bidder agent
+				
+				// if the current price is acceptable, then send a bid.
 				if (newval > ANextPriceStrategy.DONT_WANT) {
 
 					ACLMessage reply = msg.createReply();
@@ -82,9 +81,6 @@ public class BidderAgentDutch extends Agent{
 					System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 					System.out.println("");
 
-					System.out.println(getAID().getLocalName()+" quit the auction!");
-					System.out.println("");
-					myAgent.doDelete();
 				}
 			}
 			else {
@@ -93,6 +89,7 @@ public class BidderAgentDutch extends Agent{
 		}
 	}
 	
+	//When received ACCEPT_PROPOSAL message, all bidders quit
 	private class EndBid extends CyclicBehaviour {
 		public void action() {
 			MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL),
