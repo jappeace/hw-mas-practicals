@@ -169,6 +169,9 @@ public class AuctioneerAgentDutch extends Agent {
 				try {
 					DFAgentDescription[] result = DFService.search(myAgent, template);
 					numOfBidder = result.length;
+					for (int i = 0; i < numOfBidder; i++) {
+						bidderAgents[i] = result[i].getName();
+					}
 				} catch (FIPAException fe) {
 					fe.printStackTrace();
 				}
