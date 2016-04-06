@@ -37,6 +37,7 @@ The Auction will be closed at following 2 situations:
  We defined 2 behaviours for bidde agents:
  * OfferBid
  * WinBid
+
 ##### OfferBid
 In the OfferBid behaviour, the bidder agents receive the latest highest price from other bidder agents(transftered by auctioneer agent), and decide whether to give a higher price or quit the auction according to their own price strategy and the valuation of the auction good. 
 
