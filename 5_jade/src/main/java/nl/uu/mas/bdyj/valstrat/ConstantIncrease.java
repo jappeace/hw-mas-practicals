@@ -2,16 +2,19 @@ package nl.uu.mas.bdyj.valstrat;
 
 import nl.uu.mas.bdyj.Item;
 
-import java.util.Random;
-
-public class ConstantIncrease implements NextPriceStrategy{
-	private int increase  = 0;
-	public ConstantIncrease(int increase) {
-		this.increase = increase;
+public class ConstantIncrease extends ANextPriceStrategy{
+	private final int increaseAmount;
+	public ConstantIncrease(ItemValuation valuationStrategy, int increase) {
+		super(valuationStrategy);
+		this.increaseAmount = increase;
 	}
 
 	@Override
 	public int decide(Item item, int currentPrice) {
-		return increase;
+		int newval =  currentPrice + increaseAmount;
+		if(newval < valuationStrategy.valuate(item)){
+			return newval;
+		}
+		return DONT_WANT;
 	}
 }

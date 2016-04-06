@@ -9,9 +9,7 @@ import nl.uu.mas.bdyj.agents.AuctioneerAgent;
 import nl.uu.mas.bdyj.agents.BidderAgent;
 import nl.uu.mas.bdyj.agents.AuctioneerAgentDutch;
 import nl.uu.mas.bdyj.agents.BidderAgentDutch;
-import nl.uu.mas.bdyj.valstrat.ConstantItemValuation;
-import nl.uu.mas.bdyj.valstrat.RandomScaledValuation;
-import nl.uu.mas.bdyj.valstrat.RandomValuation;
+import nl.uu.mas.bdyj.valstrat.*;
 import org.slf4j.LoggerFactory;
 import nl.uu.mas.bdyj.valstrat.ConstantItemValuation;
 import nl.uu.mas.bdyj.valstrat.RandomScaledValuation;
@@ -75,20 +73,22 @@ class Main{
 	}
 	public static void startContainer(jade.wrapper.AgentContainer container) throws StaleProxyException {
 		Item tem = new Item("candy");
-		container.acceptNewAgent("timmy", new BidderAgentDutch(
+		container.acceptNewAgent("timmy", new BidderAgent(
 				new RandomValuation(
 						new ConstantItemValuation(120)
 				), tem)
 		).start();
-		container.acceptNewAgent("hendrik", new BidderAgentDutch(
+		container.acceptNewAgent("hendrik", new BidderAgent(
 				new RandomScaledValuation(
 						new ConstantItemValuation(100)
 				), tem)
 		).start();
-		List<Item> items = new LinkedList<Item>();
-		items.add(new Item("blah"));
-		//container.acceptNewAgent("leo", new AuctioneerAgent(10,"candy")).start();
-		container.acceptNewAgent("leo", new AuctioneerAgentDutch(160,"candy",3)).start();
+		container.acceptNewAgent("pim", new BidderAgent(
+				new ConstantIncrease(
+						new ConstantItemValuation(130), 1
+				), tem)
+		).start();
+		container.acceptNewAgent("leo", new AuctioneerAgent(0,tem.name)).start();
 	}
 
 }
