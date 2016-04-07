@@ -1,4 +1,4 @@
-package nl.uu.mas.bdyj;
+package nl.uu.mas.bdyj.agents;
 
 import jade.core.Agent;
 
@@ -13,12 +13,13 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import nl.uu.mas.bdyj.Item;
 import nl.uu.mas.bdyj.valstrat.ANextPriceStrategy;
 import nl.uu.mas.bdyj.valstrat.NextPriceStrategy;
 
 
-public class BidderAgent extends Agent{
-	public BidderAgent(NextPriceStrategy valuation, Item auctionGood){
+public class BidderAgentDutch extends Agent{
+	public BidderAgentDutch(NextPriceStrategy valuation, Item auctionGood){
 		this.valuation = valuation;
 		this.auctionGood = auctionGood;
 	}
@@ -40,7 +41,7 @@ public class BidderAgent extends Agent{
 			fe.printStackTrace();
 		}
 		addBehaviour(new OfferBid());
-		addBehaviour(new WinBid());
+		addBehaviour(new EndBid());
 
 	}
 	
@@ -65,48 +66,41 @@ public class BidderAgent extends Agent{
 			if (msg != null) {
 				// CFP Message received. Process it
 				// currentPrice is the latest higest price from all bidder agents
-				String msgContent = msg.getContent();
-				String msgSplit[] = msgContent.split(" ");
-				// msgSplit[0] is currentBidder and msgSplit[1] is currentPrice
-				String currentBidder = msgSplit[0];
-				int currentPrice = Integer.valueOf(msgSplit[1]);
+				int currentPrice = Integer.valueOf(msg.getContent());
 				int newval = valuation.decide(auctionGood, currentPrice);
 				// if the latest highest price is larger than the valuation of each bidder agent
 				// then quit the auction and terminate the bidder agent
-				if (newval  <= ANextPriceStrategy.DONT_WANT) {
-					System.out.println(getAID().getLocalName()+" quit the auction!");
-					System.out.println("");
-					myAgent.doDelete();
-					return;
-				}
-				
-				// if the latet highest price if less than the valuation
-				// and if not given by the bidder agent self
-				// then give a new bid price which is higher than the latest higest price and less than valuation
-				if (!currentBidder.equals(getAID().getLocalName())) {
+				if (newval > ANextPriceStrategy.DONT_WANT) {
+
 					ACLMessage reply = msg.createReply();
 					reply.setPerformative(ACLMessage.PROPOSE);
 					reply.setConversationId(auctionGood.name);
-					reply.setContent(newval+"");
+					reply.setContent(currentPrice+"");
 					myAgent.send(reply);
 					System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-					System.out.println(getAID().getLocalName() + " cries a higher price: " + newval);
+					System.out.println(getAID().getLocalName() + " cries a bid: " + currentPrice);
 					System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 					System.out.println("");
+
+					System.out.println(getAID().getLocalName()+" quit the auction!");
+					System.out.println("");
+					myAgent.doDelete();
 				}
 			}
 			else {
-				block(5000);
+				block(500);
 			}
 		}
 	}
 	
-	private class WinBid extends CyclicBehaviour {
+	private class EndBid extends CyclicBehaviour {
 		public void action() {
 			MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL),
                     MessageTemplate.MatchConversationId(auctionGood.name));
 			ACLMessage msg = myAgent.receive(mt);
 			if (msg != null) {
+				System.out.println(getAID().getLocalName()+" quit the auction!");
+				System.out.println("");
 				myAgent.doDelete();
 			}
 			else {
