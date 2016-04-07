@@ -7,7 +7,7 @@ Bram Zijlstra      5774284
 Yunlu Chen         5684218
 Deliang Wu         5622182
 ```
-## Build guide
+### 1.1 Build guide
 
 	./gradlew run
 
