@@ -71,3 +71,5 @@ local.properties
 # Code Recommenders
 # ignore yunlu start file
 a.bat
+/5_jade/.nb-gradle/
+/5_jade/build/
