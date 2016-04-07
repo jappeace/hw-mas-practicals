@@ -16,8 +16,8 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 
 
-public class AuctioneerAgent extends Agent{
-	public AuctioneerAgent(int startingPrice, String auctionGood){
+public class SecondAuctioneerAgent extends Agent{
+	public SecondAuctioneerAgent(int startingPrice, String auctionGood){
 		this.auctionGood = auctionGood;
 		this.startingPrice = startingPrice;
 		currentPrice = startingPrice;
