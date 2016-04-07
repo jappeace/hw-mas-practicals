@@ -124,11 +124,14 @@ public class AuctioneerAgent extends Agent{
 				// receivePrice is the price received from any bidder agents
 				int receivedPrice = Integer.valueOf(msg.getContent());
 				String sender = msg.getSender().getLocalName();
-				
 				// If the received price is higher than last highest price, then update it
 				// as the latest highest price
 				if (receivedPrice > currentPrice) {
-					currentPrice = receivedPrice;
+                                        System.out.println("test1 :" + currentPrice);
+					int secondPrice = currentPrice;
+                                        currentPrice = receivedPrice;
+                                        System.out.println(" test2 :" + currentPrice);
+                                        System.out.println(" test3 :" + secondPrice);
 					currentBidder = sender;
 					currentBidderAid = msg.getSender();
 					System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++");

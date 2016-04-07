@@ -2,9 +2,8 @@ package nl.uu.mas.bdyj;
 
 import jade.core.Agent;
 
-import java.util.Random;
+//import java.util.Random;
 import java.util.concurrent.TimeUnit;
-
 import jade.core.AID;
 import jade.core.behaviours.*;
 import jade.lang.acl.ACLMessage;
@@ -15,15 +14,15 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import nl.uu.mas.bdyj.valstrat.ANextPriceStrategy;
 import nl.uu.mas.bdyj.valstrat.NextPriceStrategy;
-
+import nl.uu.mas.bdyj.valstrat.ItemValuation;
 
 public class BidderAgent extends Agent{
-	public BidderAgent(NextPriceStrategy valuation, Item auctionGood){
+	public BidderAgent(ItemValuation valuation, Item auctionGood){
 		this.valuation = valuation;
 		this.auctionGood = auctionGood;
 	}
 	// agent initializations
-	NextPriceStrategy valuation;
+	ItemValuation valuation;
 	Item auctionGood;
 	protected void setup() {
 		System.out.println("Hello! BidderAgent " + getAID().getLocalName() + " is ready.");
@@ -70,7 +69,7 @@ public class BidderAgent extends Agent{
 				// msgSplit[0] is currentBidder and msgSplit[1] is currentPrice
 				String currentBidder = msgSplit[0];
 				int currentPrice = Integer.valueOf(msgSplit[1]);
-				int newval = valuation.decide(auctionGood, currentPrice);
+				int newval = valuation.valuate(auctionGood);
 				// if the latest highest price is larger than the valuation of each bidder agent
 				// then quit the auction and terminate the bidder agent
 				if (newval  <= ANextPriceStrategy.DONT_WANT) {
