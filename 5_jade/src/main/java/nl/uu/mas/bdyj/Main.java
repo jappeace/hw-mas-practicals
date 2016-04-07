@@ -1,5 +1,7 @@
 package nl.uu.mas.bdyj;
 
+import nl.uu.mas.bdyj.agents.SecondBidderAgent;
+import nl.uu.mas.bdyj.agents.SecondAuctioneerAgent;
 import jade.Boot;
 import jade.core.*;
 import jade.core.Runtime;
@@ -21,10 +23,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import java.util.Random;
+import java.util.Scanner;
 class Main{
+    
 	private static final Logger log = LoggerFactory.getLogger(Main.class);
 	public static void main(String[] argsb) {
-		log.info("the JADI returns!");
+	
+            log.info("the JADI returns!");
 		final Agent a = new Agent(){
 			@Override
 			protected void setup() {
@@ -71,21 +76,50 @@ class Main{
 			e.printStackTrace();
 		}
 	}
-	public static void startContainer(jade.wrapper.AgentContainer container) throws StaleProxyException {
-		Item tem = new Item("candy");
-		container.acceptNewAgent("timmy", new SecondBidderAgent(
-						new ConstantItemValuation(120)
-				, tem)
-		).start();
-		container.acceptNewAgent("hendrik", new SecondBidderAgent(
-						new ConstantItemValuation(100)
-				, tem)
-		).start();
-		container.acceptNewAgent("pim", new SecondBidderAgent(
-						new ConstantItemValuation(130)
-				, tem)
-		).start();
-		container.acceptNewAgent("leo", new SecondAuctioneerAgent(0,tem.name)).start();
-	}
+       interface Factory{
+           void createBidder(int i) throws StaleProxyException; 
+           void createAuctioneer() throws StaleProxyException;
+           
+       }
+       static void startAuction(Factory factory, int bidderCount) throws StaleProxyException {
+           for (int i=0; i<bidderCount; i++){
+               factory.createBidder(i); 
+           }
+        factory.createAuctioneer();  
+       }
+	public static void startContainer(final jade.wrapper.AgentContainer container) throws StaleProxyException {
+	final Item tem = new Item("candy");
 
+        int auction = 0;
+        int bidders = 10;
+        //System.out.println("How many agents do you want:");
+        //int numberOfAgents = Integer.parseInt(reader.nextLine());        
+        switch (auction){
+            case 0: System.out.println("Welcome to the English Auction!");
+            startAuction(new Factory(){
+
+            @Override
+            public void createBidder(int i) throws StaleProxyException {
+                container.acceptNewAgent("bidder" + i, new BidderAgent(
+                new ConstantIncrease(
+                new ConstantItemValuation(10*i),i), tem));
+                        }
+
+            @Override
+            public void createAuctioneer() throws StaleProxyException {
+            container.acceptNewAgent("leo", new AuctioneerAgent(0,tem.name)).start();
+            }
+                
+            }, bidders)
+            ; break ;
+            case 1: System.out.println("Welcome to the Dutch Auction!");
+            ; break ;
+            case 2: System.out.println("Welcome to the Second Price Auction");
+            ; break ;
+                
+        //System.out.println("We have " + numberOfAgents + " agents today!");
+        }
+        
+              
+        }
 }

@@ -1,4 +1,4 @@
-package nl.uu.mas.bdyj;
+package nl.uu.mas.bdyj.agents;
 
 import jade.core.Agent;
 
@@ -12,6 +12,7 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import nl.uu.mas.bdyj.Item;
 import nl.uu.mas.bdyj.valstrat.ANextPriceStrategy;
 import nl.uu.mas.bdyj.valstrat.NextPriceStrategy;
 import nl.uu.mas.bdyj.valstrat.ItemValuation;

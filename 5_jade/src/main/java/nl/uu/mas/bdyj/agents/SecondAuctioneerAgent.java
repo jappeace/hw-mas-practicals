@@ -1,4 +1,4 @@
-package nl.uu.mas.bdyj;
+package nl.uu.mas.bdyj.agents;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -47,8 +47,7 @@ public class SecondAuctioneerAgent extends Agent {
 		addBehaviour(new TickerBehaviour(this, 1000) {
 			protected void onTick() {
 				timer = timer + 1;
-				System.out.println("timer = " + String.valueOf(timer));
-			}
+							}
 		});
 	}
 
