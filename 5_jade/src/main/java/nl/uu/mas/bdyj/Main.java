@@ -75,14 +75,18 @@ class Main{
 	public static void startContainer(final jade.wrapper.AgentContainer container) throws StaleProxyException {
 	final Item tem = new Item("candy");
 
-        int auction = 2;
-        int bidders = 3;
+        int auction = 0;
+        int bidders = 10;
         //System.out.println("How many agents do you want:");
         //int numberOfAgents = Integer.parseInt(reader.nextLine());
 		final List<NextPriceStrategy> strategies = new ArrayList<NextPriceStrategy>();
-		strategies.add(new ConstantIncrease( new ConstantItemValuation(45),1));
-		strategies.add(new RandomScaledValuation(new ConstantItemValuation(20))); // I know this is unsafe
-		strategies.add(new ConstantIncrease( new ConstantItemValuation(100),5));
+
+		// crreate some entropy
+		for(int i = 0; i < 100; i++){
+			strategies.add(new ConstantIncrease( new ConstantItemValuation(rng.nextInt(100)),1));
+			strategies.add(new ConstantIncrease( new ConstantItemValuation(rng.nextInt(80)),5));
+		}
+		strategies.add(new RandomScaledValuation(new ConstantItemValuation(80))); // I know this is unsafe
         switch (auction){
             case 0: // English
 				System.out.println("Welcome to the English Auction!");

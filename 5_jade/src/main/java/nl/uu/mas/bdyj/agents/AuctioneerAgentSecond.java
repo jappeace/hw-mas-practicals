@@ -19,34 +19,44 @@ public class AuctioneerAgentSecond extends AAuctioneer{
 		super(startingPrice, auctionGood);
 	}
 
-	// agent initializations
-	// the auctioneer will send the latest price to every bidder agents when getNewPrice is asserted
-	// set the initial value of getNewPrice to true to make the auctioneer agent send out the starting price
-	// getNewPrice will be set to false after sending the latest price and 
-	// be set to true after receiving a new price which is higher than current price from any bidder agents
-	int currentPrice;
-	String currentBidder;
-	AID currentBidderAid;
-	int timer = 0;
-	boolean closeAuction = false;
+	int secondPrice = 0;
 
 	protected void setup() {
+		super.setup();
 		System.out.println("Hello! AuctioneerAgent " + getAID().getLocalName() + " is ready.");
-		// start the auction, delay 2000ms to wait all bidder agents start
-		addBehaviour(new WakerBehaviour(this, 2000) {
-			protected void handleElapsedTimeout() {
-				addBehaviour(new SendPrice());
-				addBehaviour(new ReceiveBid());
-				addBehaviour(new CloseAuction());
+		addBehaviour(new WakerBehaviour(this, 5000) {
+			protected void onWake() {
+				closeAuction();
 			}
 		});
-		addBehaviour(new TickerBehaviour(this, 1000) {
-			protected void onTick() {
-				timer = timer + 1;
-							}
+		addBehaviour(new WakerBehaviour(this, 2000) {
+			protected void onWake() {
+				addBehaviour(new SendPrice());
+			}
 		});
 	}
 
+	@Override
+	protected void onReceivePrice(int price, AID aid) {
+		if (price > currentPrice) {
+			secondPrice = currentPrice;
+			currentPrice = price;
+			currentBidder = aid.getLocalName();
+			currentBidderAid = aid;
+		} else {
+			if (price > secondPrice) {
+				secondPrice = price;
+			}
+		}
+	}
+
+	/**
+	 * Cheap way to override the price in result
+	 * @return
+	 */
+	protected int getPrice(){
+		return secondPrice;
+	}
 
 	/*
 	 * behaviour for acutioneer to announce the latest higest price
@@ -59,70 +69,16 @@ public class AuctioneerAgentSecond extends AAuctioneer{
 	}
 
 	/*
-	 * behaviour for auctioneer to receive bids from each bidder 
-	 */
-	int secondPrice = 0;
-
-	private class ReceiveBid extends CyclicBehaviour {
-		public void action() {
-
-			MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.PROPOSE),
-					MessageTemplate.MatchConversationId(auctionGood));
-			ACLMessage msg = myAgent.receive(mt);
-			if (msg != null) {
-				// receive a bid, clear the timer;
-				timer = 0;
-				// PROPOSE Message received. Process it
-				// receivePrice is the price received from any bidder agents
-				int receivedPrice = Integer.valueOf(msg.getContent());
-				String sender = msg.getSender().getLocalName();
-				// If the received price is higher than last highest price, then update it
-				// as the latest highest price
-				if (receivedPrice > currentPrice) {
-					System.out.println("test1 :" + currentPrice);
-					secondPrice = currentPrice;
-					currentPrice = receivedPrice;
-					System.out.println(" test2 :" + currentPrice);
-					System.out.println(" test3 :" + secondPrice);
-					currentBidder = sender;
-					currentBidderAid = msg.getSender();
-
-				} else {
-					if (receivedPrice > secondPrice) {
-						secondPrice = receivedPrice;
-					}
-				}
-			} else {
-				block();
-			}
-		}
-	}
-	
-	/*
 	 * behaviour for closing the acution
 	 */
 
-	private class CloseAuction extends CyclicBehaviour {
-		public void action() {
-			// if there is no new bid receive in 5s, then award the acution good to the
-			// bidder with latest highest price.
-			if (timer >= 5) {
-				closeAuction = true;
-				System.out.println(" ");
-				System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-				System.out.println("The auction is closed, the " + auctionGood + " was sold to " + currentBidder + " with the price " + String.valueOf(secondPrice));
-				System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-				System.out.println(" ");
-				ACLMessage cfp = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
-				cfp.addReceiver(currentBidderAid);
-				cfp.setContent(String.valueOf(currentPrice));
-				cfp.setConversationId(auctionGood);
-				cfp.setReplyWith("cfp" + System.currentTimeMillis()); // Unique value
-				myAgent.send(cfp);
-				myAgent.doDelete();
-			} else {
-			}
-		}
+	protected void takeDown() {
+		super.takeDown();
+		ACLMessage cfp = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
+		cfp.addReceiver(currentBidderAid);
+		cfp.setContent(String.valueOf(currentPrice));
+		cfp.setConversationId(auctionGood);
+		cfp.setReplyWith("cfp" + System.currentTimeMillis()); // Unique value
+		this.send(cfp);
 	}
-
 }
