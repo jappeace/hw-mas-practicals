@@ -13,6 +13,10 @@ import jade.lang.acl.MessageTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The AAuctioneer serves as an abstract base for all other auctioneers.
+ * It has handles a lot of Jade boilerplate code and some shared logic for auctions.
+ */
 abstract public class AAuctioneer extends Agent{
 	// agent initializations
 	// the auctioneer will send the latest price to every bidder agents when getNewPrice is asserted

@@ -43,6 +43,9 @@ class Main{
 
 			Runtime.instance().setCloseVM(true);
 			if(iae.getBooleanProperty("main", true)) {
+				//////////////// WE ARE IN BUSYNESS ////////////
+				// NO I didn't use the decompiler of InteliJ to figure this
+				// *UNDOCUMENTED* stuff out how to create agents properly
 				startContainer(Runtime.instance().createMainContainer(iae));
 			} else {
 				startContainer(Runtime.instance().createAgentContainer(iae));
@@ -61,19 +64,18 @@ class Main{
 			e.printStackTrace();
 		}
 	}
-	   interface Factory{
-		   void createBidder(int i) throws StaleProxyException;
-		   void createAuctioneer() throws StaleProxyException;
-
-	   }
-	   static void startAuction(Factory factory, int bidderCount) throws StaleProxyException {
-		   for (int i=0; i<bidderCount; i++){
-			   factory.createBidder(i);
-		   }
+	interface Factory{
+		void createBidder(int i) throws StaleProxyException;
+		void createAuctioneer() throws StaleProxyException;
+	}
+	static void startAuction(Factory factory, int bidderCount) throws StaleProxyException {
+		for (int i=0; i<bidderCount; i++){
+		   factory.createBidder(i);
+		}
 		factory.createAuctioneer();
-	   }
+	}
 	public static void startContainer(final jade.wrapper.AgentContainer container) throws StaleProxyException {
-	final Item tem = new Item("candy");
+		final Item tem = new Item("candy");
 
         int auction = 2; // 0 english, 1 dutch, 2 second
         int biddersCount = 10;
@@ -127,6 +129,6 @@ class Main{
 					}
 				}, biddersCount);
 				break;
-        }
+			}
         }
 }

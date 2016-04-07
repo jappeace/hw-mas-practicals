@@ -19,6 +19,10 @@ import nl.uu.mas.bdyj.valstrat.ItemValuation;
 
 public class BidderAgentSecond extends ABidderAgent{
 	public BidderAgentSecond(ItemValuation valuation, Item auctionGood){
+		// a weird call, because the secondprice doesn't
+		// need pricing stragy, its honest about its price.
+		// It would've been better maybe to create a honest NextPriceStrategy that
+		// just returns the valuation.
 		super(null,auctionGood);
 		this.valuation = valuation;
 	}

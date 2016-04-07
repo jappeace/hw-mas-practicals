@@ -1,5 +1,10 @@
 package nl.uu.mas.bdyj;
 
+/**
+ * We had many ideas for the item class, however currently only the name
+ * is used. We wanted to create several ItemValuation implementations that
+ * would valuate Material and color differently for example.
+ */
 public class Item {
 	public String name;
 	public Color color;

@@ -2,7 +2,6 @@ package nl.uu.mas.bdyj.agents;
 
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
@@ -12,6 +11,11 @@ import jade.lang.acl.MessageTemplate;
 import nl.uu.mas.bdyj.Item;
 import nl.uu.mas.bdyj.valstrat.NextPriceStrategy;
 
+/**
+ * ABidder servers as a common base for all bidders.
+ * It handles most of the message received logic whie giving the childeren
+ * the choice on how to implement it.
+ */
 abstract public class ABidderAgent extends Agent{
 	public ABidderAgent(NextPriceStrategy valuation, Item auctionGood){
 		super();
