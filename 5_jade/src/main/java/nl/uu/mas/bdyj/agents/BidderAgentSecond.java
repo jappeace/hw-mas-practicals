@@ -26,7 +26,6 @@ public class BidderAgentSecond extends ABidderAgent{
 	protected void setup() {
 		super.setup();
 		addBehaviour(new OfferBid());
-		addBehaviour(new WinBid());
 	}
 	
 	private class OfferBid extends CyclicBehaviour {
@@ -69,20 +68,6 @@ public class BidderAgentSecond extends ABidderAgent{
 			}
 			else {
 				block(5000);
-			}
-		}
-	}
-	
-	private class WinBid extends CyclicBehaviour {
-		public void action() {
-			MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL),
-                    MessageTemplate.MatchConversationId(auctionGood.name));
-			ACLMessage msg = myAgent.receive(mt);
-			if (msg != null) {
-				myAgent.doDelete();
-			}
-			else {
-				block();
 			}
 		}
 	}

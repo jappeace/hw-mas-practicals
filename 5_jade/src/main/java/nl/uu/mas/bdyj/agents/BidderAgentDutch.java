@@ -25,7 +25,6 @@ public class BidderAgentDutch extends ABidderAgent{
 	protected void setup() {
 		super.setup();
 		addBehaviour(new OfferBid());
-		addBehaviour(new EndBid());
 	}
 
 	private class OfferBid extends CyclicBehaviour {
@@ -59,20 +58,4 @@ public class BidderAgentDutch extends ABidderAgent{
 		}
 	}
 	
-	//When received ACCEPT_PROPOSAL message, all bidders quit
-	private class EndBid extends CyclicBehaviour {
-		public void action() {
-			MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL),
-                    MessageTemplate.MatchConversationId(auctionGood.name));
-			ACLMessage msg = myAgent.receive(mt);
-			if (msg != null) {
-				System.out.println(getAID().getLocalName()+" quit the auction!");
-				System.out.println("");
-				myAgent.doDelete();
-			}
-			else {
-				block();
-			}
-		}
-	}
 }
