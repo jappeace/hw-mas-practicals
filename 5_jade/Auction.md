@@ -7,6 +7,12 @@ Bram Zijlstra      5774284
 Yunlu Chen         5684218
 Deliang Wu         5622182
 ```
+## Build guide
+
+	./gradlew run
+
+Should fetch gradle and all dependencies (may take a while the first time)
+Best to just run it from command line if you don't want to edit it.
 
 ## 2. Implementation
 ### 2.1 English auction
