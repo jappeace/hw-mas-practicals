@@ -75,8 +75,8 @@ class Main{
 	public static void startContainer(final jade.wrapper.AgentContainer container) throws StaleProxyException {
 	final Item tem = new Item("candy");
 
-        int auction = 0;
-        int bidders = 10;
+        int auction = 1; // 0 english, 1 dutch, 2 second
+        int biddersCount = 10;
         //System.out.println("How many agents do you want:");
         //int numberOfAgents = Integer.parseInt(reader.nextLine());
 		final List<NextPriceStrategy> strategies = new ArrayList<NextPriceStrategy>();
@@ -93,13 +93,13 @@ class Main{
 				startAuction(new Factory(){
 					@Override
 					public void createBidder(int i) throws StaleProxyException {
-						container.acceptNewAgent("bidder" + i, new BidderAgent(strategies.get(rng.nextInt(strategies.size())), tem)).start();
+						container.acceptNewAgent("bidder" + i, new BidderAgentEnglish(strategies.get(rng.nextInt(strategies.size())), tem)).start();
 					}
 					@Override
 					public void createAuctioneer() throws StaleProxyException {
-						container.acceptNewAgent("leo", new AuctioneerAgent(0,tem.name)).start();
+						container.acceptNewAgent("leo", new AuctioneerAgentEnglish(0,tem.name)).start();
 					}
-				}, bidders);
+				}, biddersCount);
 				break;
             case 1: // Dutch
 				System.out.println("Welcome to the Dutch Auction!");
@@ -112,7 +112,7 @@ class Main{
 					public void createAuctioneer() throws StaleProxyException {
 						container.acceptNewAgent("leo", new AuctioneerAgentDutch(1000,tem.name,1)).start();
 					}
-				}, bidders);
+				}, biddersCount);
 				break ;
             case 2: // SecondPrice sealed bid
 				System.out.println("Welcome to the Second Price Auction");
@@ -125,7 +125,7 @@ class Main{
 					public void createAuctioneer() throws StaleProxyException {
 						container.acceptNewAgent("leo", new AuctioneerAgentSecond(0,tem.name)).start();
 					}
-				}, bidders);
+				}, biddersCount);
 				break;
         }
         }

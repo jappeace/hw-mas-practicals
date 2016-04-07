@@ -18,8 +18,8 @@ import nl.uu.mas.bdyj.valstrat.ANextPriceStrategy;
 import nl.uu.mas.bdyj.valstrat.NextPriceStrategy;
 
 
-public class BidderAgent extends Agent{
-	public BidderAgent(NextPriceStrategy valuation, Item auctionGood){
+public class BidderAgentEnglish extends Agent{
+	public BidderAgentEnglish(NextPriceStrategy valuation, Item auctionGood){
 		this.valuation = valuation;
 		this.auctionGood = auctionGood;
 	}

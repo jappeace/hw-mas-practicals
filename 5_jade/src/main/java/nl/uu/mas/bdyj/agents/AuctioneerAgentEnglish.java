@@ -14,8 +14,8 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 
-public class AuctioneerAgent extends AAuctioneer{
-	public AuctioneerAgent(int startingPrice, String auctionGood) {
+public class AuctioneerAgentEnglish extends AAuctioneer{
+	public AuctioneerAgentEnglish(int startingPrice, String auctionGood) {
 		super(startingPrice, auctionGood);
 	}
 
