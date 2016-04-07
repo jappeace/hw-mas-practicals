@@ -1,1 +1,0 @@
--gui -local-port 1100 jade.Boot;buyer1:examples.bookTrading.BookBuyerAgent(book1,book2,book3);seller1:examples.bookTrading.BookSellerAgent(book2,book3,book4)
