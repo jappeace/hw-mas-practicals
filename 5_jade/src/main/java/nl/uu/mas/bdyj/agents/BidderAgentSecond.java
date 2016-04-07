@@ -17,44 +17,16 @@ import nl.uu.mas.bdyj.valstrat.ANextPriceStrategy;
 import nl.uu.mas.bdyj.valstrat.NextPriceStrategy;
 import nl.uu.mas.bdyj.valstrat.ItemValuation;
 
-public class BidderAgentSecond extends Agent{
+public class BidderAgentSecond extends ABidderAgent{
 	public BidderAgentSecond(ItemValuation valuation, Item auctionGood){
+		super(null,auctionGood);
 		this.valuation = valuation;
-		this.auctionGood = auctionGood;
 	}
-	// agent initializations
-	ItemValuation valuation;
-	Item auctionGood;
+	private ItemValuation valuation;
 	protected void setup() {
-		System.out.println("Hello! BidderAgent " + getAID().getLocalName() + " is ready.");
-		DFAgentDescription dfd = new DFAgentDescription();
-		ServiceDescription sd = new ServiceDescription();
-		sd.setType(auctionGood.name);
-		sd.setName("JADE-Auction");
-		dfd.setName(getAID());
-		dfd.addServices(sd);
-		try {
-			DFService.register(this, dfd);
-		}
-		catch (FIPAException fe) {
-			fe.printStackTrace();
-		}
+		super.setup();
 		addBehaviour(new OfferBid());
 		addBehaviour(new WinBid());
-
-	}
-	
-	// Put agent clean-up operations here
-	protected void takeDown() {
-		// Deregister from the yellow pages
-		try {
-			DFService.deregister(this);
-		}
-		catch (FIPAException fe) {
-			fe.printStackTrace();
-		}
-		// Printout a dismissal message
-		System.out.println("BidAgent "+getAID().getLocalName()+" terminating.");
 	}
 	
 	private class OfferBid extends CyclicBehaviour {
