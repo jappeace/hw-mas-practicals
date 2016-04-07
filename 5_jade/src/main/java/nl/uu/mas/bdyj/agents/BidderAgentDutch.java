@@ -24,38 +24,25 @@ public class BidderAgentDutch extends ABidderAgent{
 	}
 	protected void setup() {
 		super.setup();
-		addBehaviour(new OfferBid());
 	}
 
-	private class OfferBid extends CyclicBehaviour {
-		public void action() {
-			MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.CFP),
-					                                 MessageTemplate.MatchConversationId(auctionGood.name));
-			ACLMessage msg = myAgent.receive(mt);
-			if (msg != null) {
-				// CFP Message received. Get current price from it
-				int currentPrice = Integer.valueOf(msg.getContent());
-				int newval = valuation.decide(auctionGood, currentPrice);
-				
-				// if the current price is acceptable, then send a bid.
-				if (newval > ANextPriceStrategy.DONT_WANT) {
+	@Override
+	void onMessage(String msg, ACLMessage reply) {
+		// CFP Message received. Get current price from it
+		int currentPrice = Integer.valueOf(msg);
+		int newval = valuation.decide(auctionGood, currentPrice);
 
-					ACLMessage reply = msg.createReply();
-					reply.setPerformative(ACLMessage.PROPOSE);
-					reply.setConversationId(auctionGood.name);
-					reply.setContent(currentPrice+"");
-					myAgent.send(reply);
-					System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-					System.out.println(getAID().getLocalName() + " cries a bid: " + currentPrice);
-					System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-					System.out.println("");
+		// if the current price is acceptable, then send a bid.
+		if (newval > ANextPriceStrategy.DONT_WANT) {
+			reply.setPerformative(ACLMessage.PROPOSE);
+			reply.setConversationId(auctionGood.name);
+			reply.setContent(currentPrice+"");
+			this.send(reply);
+			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+			System.out.println(getAID().getLocalName() + " cries a bid: " + currentPrice);
+			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+			System.out.println("");
 
-				}
-			}
-			else {
-				block(500);
-			}
 		}
 	}
-	
 }

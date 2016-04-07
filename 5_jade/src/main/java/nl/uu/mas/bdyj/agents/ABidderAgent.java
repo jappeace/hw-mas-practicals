@@ -36,6 +36,7 @@ abstract public class ABidderAgent extends Agent{
 			fe.printStackTrace();
 		}
 		addBehaviour(new EndBid());
+		addBehaviour(new OfferBid());
 	}
 	// Put agent clean-up operations here
 	protected void takeDown() {
@@ -61,6 +62,23 @@ abstract public class ABidderAgent extends Agent{
 				System.out.println(getAID().getLocalName()+" quit the auction, while enjoying his new "+ auctionGood.name);
 				System.out.println("");
 				myAgent.doDelete();
+			}
+			else {
+				block();
+			}
+		}
+	}
+
+	abstract void onMessage(String msg, ACLMessage reply);
+	private class OfferBid extends CyclicBehaviour {
+		public void action() {
+			MessageTemplate mt = MessageTemplate.and(
+					MessageTemplate.MatchPerformative(ACLMessage.CFP),
+					MessageTemplate.MatchConversationId(auctionGood.name)
+			);
+			ACLMessage msg = myAgent.receive(mt);
+			if (msg != null) {
+				onMessage(msg.getContent(), msg.createReply());
 			}
 			else {
 				block();
