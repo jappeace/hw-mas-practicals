@@ -107,17 +107,24 @@ The following part would discuss the difference with regard to English auction.(
 
 -When received ACCEPT_PROPOSAL message, all bidders quit.
 
+### 2.3 Second-price auction
 
 For the second-price auction, we used the framework of the English auction and edited the behavior of the agents and auctioneer. Where in the English auction we have multiple rounds and bid strategies, we don't need this in the second-price auction. The agents will do only one bid, where the highest bid will get the item for the price of the second highest bid. Since in a second-price aution truth-telling is the dominant strategy, we can use their valuation as the price strategy.
 
-We also make a function for storing the second highest price, so that we can use that at the end of the auction as the selling price. We implement this as followed:
+We also make a function for storing the second highest price, so that we can use that at the end of the auction as the selling price. We implement this as following:
+
 ```sh
 if (receivedPrice > currentPrice) {
-					System.out.println("test1 :" + currentPrice);
-					secondPrice = currentPrice;
-					currentPrice = receivedPrice;
-					System.out.println(" test2 :" + currentPrice);
-					System.out.println(" test3 :" + secondPrice);
-					currentBidder = sender;
-					currentBidderAid = msg.getSender();
+	secondPrice = currentPrice;
+	currentPrice = receivedPrice;
+	currentBidder = sender;
+	currentBidderAid = msg.getSender();
 ```
+
+Now to prevent the (unlikely) case where the first bid that the auctioneer evaluates is also the highest (and so no secondPrice function is made), we made a function the other way around as well:
+
+```sh
+} else {
+	if (receivedPrice > secondPrice) {
+	secondPrice = receivedPrice;
+
