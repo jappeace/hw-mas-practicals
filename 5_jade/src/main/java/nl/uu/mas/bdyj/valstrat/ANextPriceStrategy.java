@@ -6,4 +6,8 @@ public abstract class ANextPriceStrategy implements NextPriceStrategy{
 	public ANextPriceStrategy(ItemValuation valuationStrategy){
 		this.valuationStrategy = valuationStrategy;
 	}
+	@Override
+	public ItemValuation getValuation(){
+		return valuationStrategy;
+	}
 }

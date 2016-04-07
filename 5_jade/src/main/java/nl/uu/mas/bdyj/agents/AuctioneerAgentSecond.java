@@ -14,11 +14,9 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 
-public class SecondAuctioneerAgent extends Agent {
-	public SecondAuctioneerAgent(int startingPrice, String auctionGood) {
-		this.auctionGood = auctionGood;
-		this.startingPrice = startingPrice;
-		currentPrice = startingPrice;
+public class AuctioneerAgentSecond extends AAuctioneer{
+	public AuctioneerAgentSecond(int startingPrice, String auctionGood) {
+		super(startingPrice, auctionGood);
 	}
 
 	// agent initializations
@@ -26,8 +24,6 @@ public class SecondAuctioneerAgent extends Agent {
 	// set the initial value of getNewPrice to true to make the auctioneer agent send out the starting price
 	// getNewPrice will be set to false after sending the latest price and 
 	// be set to true after receiving a new price which is higher than current price from any bidder agents
-	String auctionGood;
-	int startingPrice;
 	int currentPrice;
 	String currentBidder;
 	AID currentBidderAid;
@@ -51,11 +47,6 @@ public class SecondAuctioneerAgent extends Agent {
 		});
 	}
 
-	// Put agent clean-up operations here
-	protected void takeDown() {
-		// Printout a dismissal message
-		System.out.println("AuctioneerAgent " + getAID().getLocalName() + " terminating.");
-	}
 
 	/*
 	 * behaviour for acutioneer to announce the latest higest price
@@ -63,27 +54,7 @@ public class SecondAuctioneerAgent extends Agent {
 	 */
 	private class SendPrice extends OneShotBehaviour {
 		public void action() {
-			DFAgentDescription template = new DFAgentDescription();
-			ServiceDescription sd = new ServiceDescription();
-			sd.setType(auctionGood);
-			template.addServices(sd);
-			try {
-				for (DFAgentDescription agent : DFService.search(myAgent, template)) {
-					ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
-					cfp.addReceiver(agent.getName());
-					// content is the latest highest price and the local name of the bidder who cried this price
-					// format is localName + " " + currentPrice
-					cfp.setContent(currentBidder + " " + String.valueOf(currentPrice));
-					cfp.setConversationId(auctionGood);
-					cfp.setReplyWith("cfp" + System.currentTimeMillis()); // Unique value
-					myAgent.send(cfp);
-
-				}
-
-			} catch (FIPAException fe) {
-				fe.printStackTrace();
-			}
-
+			broadcast(currentBidder + " " + String.valueOf(currentPrice));
 		}
 	}
 

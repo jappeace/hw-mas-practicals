@@ -13,12 +13,10 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 
-public class AuctioneerAgentDutch extends Agent {
+public class AuctioneerAgentDutch extends AAuctioneer{
 	public AuctioneerAgentDutch(int startingPrice, String auctionGood,int minIncrement) {
-		this.auctionGood = auctionGood;
-		this.startingPrice = startingPrice;
+		super(startingPrice, auctionGood);
 		this.minIncrement = minIncrement;
-		currentPrice = startingPrice;
 	}
 
 	// agent initializations
@@ -27,26 +25,16 @@ public class AuctioneerAgentDutch extends Agent {
 	// getNewPrice will be set to false after sending the latest price and 
 	// be set to true after receiving a new price which is higher than current price from any bidder agents
 	private boolean existBid = false;
-	String auctionGood;
-	int startingPrice;
-	int currentPrice;
 	String currentBidder;
 	AID currentBidderAid;
-	int timer = 0;
 	boolean closeAuction = false;
 	int minIncrement;
 
 	protected void setup() {
 		System.out.println("Hello! AuctioneerAgent " + getAID().getLocalName() + " is ready.");
 		final Agent a = this;
-		addBehaviour(new TickerBehaviour(this, 1000) {
-			protected void onTick() {
-				timer = timer + 1;
-				System.out.println("timer = " + String.valueOf(timer));
-			}
-		});
 
-		addBehaviour(new SendPrice(this, 1000));
+		addBehaviour(new SendPrice(this, 10));
 
 		addBehaviour(new WakerBehaviour(this, 2000) {
 			protected void handleElapsedTimeout() {
@@ -76,46 +64,10 @@ public class AuctioneerAgentDutch extends Agent {
 		@Override
 		protected void onTick() {
 
-			AID bidderAgents[] = new AID[5];
-			int numOfBidder = 0;
-
 			if (!existBid) {
 				// clear the timer;
-				timer = 0;
 				currentPrice = currentPrice - minIncrement;
-				System.out.println("****************************************************");
-				System.out.println("Now the price is: " + String.valueOf(currentPrice));
-				// Update the list of Bidder agents which still in
-				DFAgentDescription template = new DFAgentDescription();
-				ServiceDescription sd = new ServiceDescription();
-				sd.setType(auctionGood);
-				template.addServices(sd);
-				try {
-					DFAgentDescription[] result = DFService.search(myAgent, template);
-					System.out.println("****************************************************");
-					System.out.println("[" + getAID().getLocalName() + "] Found the following Bidder agents are still in the acution:");
-					numOfBidder = result.length;
-					for (int i = 0; i < numOfBidder; i++) {
-						bidderAgents[i] = result[i].getName();
-						System.out.println(bidderAgents[i].getLocalName());
-					}
-					System.out.println("****************************************************");
-					System.out.println("");
-				} catch (FIPAException fe) {
-					fe.printStackTrace();
-				}
-
-				// Send latest highest price to all bidder agents which are still in
-				for (int i = 0; i < numOfBidder; i++) {
-					ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
-					cfp.addReceiver(bidderAgents[i]);
-					// content is the latest highest price and the local name of the bidder who cried this price
-					// format is localName + " " + currentPrice
-					cfp.setContent(String.valueOf(currentPrice));
-					cfp.setConversationId(auctionGood);
-					cfp.setReplyWith("cfp" + System.currentTimeMillis()); // Unique value
-					myAgent.send(cfp);
-				}
+				broadcast(currentPrice + "");
 			} else {
 				block();
 			}
@@ -163,7 +115,7 @@ public class AuctioneerAgentDutch extends Agent {
 		public void action() {
 			// if there is no new bid receive in 5s, then award the acution good to the
 			// bidder with latest highest price.
-			if (timer >= 5) {
+			if (existBid) {
 				closeAuction = true;
 				System.out.println(" ");
 				System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
@@ -173,29 +125,8 @@ public class AuctioneerAgentDutch extends Agent {
 
 
 
+				broadcast(currentPrice+"");
 
-				// Update the list of Bidder agents which still in
-				AID bidderAgents[] = new AID[5];
-				int numOfBidder = 0;
-				DFAgentDescription template = new DFAgentDescription();
-				ServiceDescription sd = new ServiceDescription();
-				sd.setType(auctionGood);
-				template.addServices(sd);
-				try {
-					DFAgentDescription[] result = DFService.search(myAgent, template);
-					numOfBidder = result.length;
-				} catch (FIPAException fe) {
-					fe.printStackTrace();
-				}
-
-				for (int i = 0; i < numOfBidder; i++) {
-					ACLMessage cfp = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
-					cfp.addReceiver(bidderAgents[i]);
-					cfp.setContent(String.valueOf(currentPrice));
-					cfp.setConversationId(auctionGood);
-					cfp.setReplyWith("cfp" + System.currentTimeMillis()); // Unique value
-					myAgent.send(cfp);
-				}
 				myAgent.doDelete();
 			}
 		}
