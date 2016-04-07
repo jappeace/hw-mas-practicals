@@ -54,7 +54,7 @@ abstract public class ABidderAgent extends Agent{
 		// Printout a dismissal message
 		System.out.println("BidAgent "+getAID().getLocalName()+" terminating.");
 	}
-	//When received ACCEPT_PROPOSAL message, all bidders quit
+	//When received ACCEPT_PROPOSAL message, winning bidders quit
 	private class EndBid extends CyclicBehaviour{
 		public void action() {
 			MessageTemplate mt = MessageTemplate.and(
@@ -64,6 +64,21 @@ abstract public class ABidderAgent extends Agent{
 			ACLMessage msg = myAgent.receive(mt);
 			if (msg != null) {
 				System.out.println(getAID().getLocalName()+" quit the auction, while enjoying his new "+ auctionGood.name);
+				System.out.println("");
+				myAgent.doDelete();
+			}
+			else {
+				block();
+			}
+
+			//When received INFORM message, winning bidders quit
+			MessageTemplate mt1 = MessageTemplate.and(
+					MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+					MessageTemplate.MatchConversationId(auctionGood.name)
+			);
+			ACLMessage msg1 = myAgent.receive(mt1);
+			if (msg1 != null) {
+				System.out.println(getAID().getLocalName()+" quit the auction");
 				System.out.println("");
 				myAgent.doDelete();
 			}

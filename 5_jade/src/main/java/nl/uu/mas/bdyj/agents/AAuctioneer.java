@@ -101,7 +101,7 @@ abstract public class AAuctioneer extends Agent{
 	 */
 	private class CloseAuction extends OneShotBehaviour {
 		public void action() {
-			// if there is no new bid receive in 5s, then award the acution good to the
+			// if there is no new bid receive in 5s, then award the auction good to the
 			// bidder with latest highest price.
 			if (!conflictDeal) {
 				closeAuction = true;
@@ -116,6 +116,24 @@ abstract public class AAuctioneer extends Agent{
 				cfp.setConversationId(auctionGood);
 				cfp.setReplyWith("cfp" + System.currentTimeMillis()); // Unique value
 				myAgent.send(cfp);
+
+				//send msg to remaining bidders that the auction ended
+				DFAgentDescription template = new DFAgentDescription();
+				ServiceDescription sd = new ServiceDescription();
+				sd.setType(auctionGood);
+				template.addServices(sd);
+				try {
+					for (DFAgentDescription agent : DFService.search(myAgent, template)) {
+						ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+						msg.addReceiver(agent.getName());
+						msg.setContent("auction end");
+						msg.setConversationId(auctionGood);
+						msg.setReplyWith("msg" + System.currentTimeMillis()); // Unique value
+						myAgent.send(msg);
+					}
+				} catch (FIPAException fe) {
+					fe.printStackTrace();
+				}
 			}
 			else {
 				System.out.println(" ");
