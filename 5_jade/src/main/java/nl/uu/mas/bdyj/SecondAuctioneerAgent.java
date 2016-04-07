@@ -1,33 +1,31 @@
 package nl.uu.mas.bdyj;
 
-import jade.core.Agent;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Timer;
-
 import jade.core.AID;
-import jade.core.behaviours.*;
-import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
+import jade.core.Agent;
+import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.TickerBehaviour;
+import jade.core.behaviours.WakerBehaviour;
 import jade.domain.DFService;
-import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.domain.FIPAException;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
 
-public class SecondAuctioneerAgent extends Agent{
-	public SecondAuctioneerAgent(int startingPrice, String auctionGood){
+public class SecondAuctioneerAgent extends Agent {
+	public SecondAuctioneerAgent(int startingPrice, String auctionGood) {
 		this.auctionGood = auctionGood;
 		this.startingPrice = startingPrice;
 		currentPrice = startingPrice;
 	}
+
 	// agent initializations
 	// the auctioneer will send the latest price to every bidder agents when getNewPrice is asserted
 	// set the initial value of getNewPrice to true to make the auctioneer agent send out the starting price
 	// getNewPrice will be set to false after sending the latest price and 
 	// be set to true after receiving a new price which is higher than current price from any bidder agents
-	private boolean getNewPrice = true;
 	String auctionGood;
 	int startingPrice;
 	int currentPrice;
@@ -35,6 +33,7 @@ public class SecondAuctioneerAgent extends Agent{
 	AID currentBidderAid;
 	int timer = 0;
 	boolean closeAuction = false;
+
 	protected void setup() {
 		System.out.println("Hello! AuctioneerAgent " + getAID().getLocalName() + " is ready.");
 		// start the auction, delay 2000ms to wait all bidder agents start
@@ -52,70 +51,53 @@ public class SecondAuctioneerAgent extends Agent{
 			}
 		});
 	}
-	
+
 	// Put agent clean-up operations here
 	protected void takeDown() {
 		// Printout a dismissal message
-		System.out.println("AuctioneerAgent "+getAID().getLocalName()+" terminating.");
+		System.out.println("AuctioneerAgent " + getAID().getLocalName() + " terminating.");
 	}
-	
+
 	/*
 	 * behaviour for acutioneer to announce the latest higest price
 	 * to every bidder which are still in the acution 
 	 */
-	private class SendPrice extends CyclicBehaviour {
+	private class SendPrice extends OneShotBehaviour {
 		public void action() {
-			AID bidderAgents[] = new AID[5];
-			int numOfBidder = 0;
-			
-			if (getNewPrice == true) {
-				getNewPrice = false;
-				// Update the list of Bidder agents which still in
-				DFAgentDescription template = new DFAgentDescription();
-				ServiceDescription sd = new ServiceDescription();
-				sd.setType(auctionGood);
-				template.addServices(sd);
-				try {
-					DFAgentDescription[] result = DFService.search(myAgent, template); 
-					System.out.println("****************************************************");
-					System.out.println("[" + getAID().getLocalName() + "] Found the following Bidder agents are still in the acution:");
-					numOfBidder = result.length;
-					for (int i = 0; i < numOfBidder; i ++) {
-						bidderAgents[i] = result[i].getName();
-						System.out.println(bidderAgents[i].getLocalName());
-					}
-					System.out.println("****************************************************");
-					System.out.println("");
-				}
-				catch (FIPAException fe) {
-					fe.printStackTrace();
-				}
-
-				// Send latest highest price to all bidder agents which are still in
-				for (int i = 0; i < numOfBidder; i ++) {
+			DFAgentDescription template = new DFAgentDescription();
+			ServiceDescription sd = new ServiceDescription();
+			sd.setType(auctionGood);
+			template.addServices(sd);
+			try {
+				for (DFAgentDescription agent : DFService.search(myAgent, template)) {
 					ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
-					cfp.addReceiver(bidderAgents[i]);
+					cfp.addReceiver(agent.getName());
 					// content is the latest highest price and the local name of the bidder who cried this price
 					// format is localName + " " + currentPrice
 					cfp.setContent(currentBidder + " " + String.valueOf(currentPrice));
 					cfp.setConversationId(auctionGood);
-					cfp.setReplyWith("cfp"+System.currentTimeMillis()); // Unique value
+					cfp.setReplyWith("cfp" + System.currentTimeMillis()); // Unique value
 					myAgent.send(cfp);
+
 				}
+
+			} catch (FIPAException fe) {
+				fe.printStackTrace();
 			}
-			else {
-				block(1);
-			}
+
 		}
 	}
+
 	/*
 	 * behaviour for auctioneer to receive bids from each bidder 
 	 */
+	int secondPrice = 0;
+
 	private class ReceiveBid extends CyclicBehaviour {
 		public void action() {
-			
+
 			MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.PROPOSE),
-					                                 MessageTemplate.MatchConversationId(auctionGood));
+					MessageTemplate.MatchConversationId(auctionGood));
 			ACLMessage msg = myAgent.receive(mt);
 			if (msg != null) {
 				// receive a bid, clear the timer;
@@ -127,21 +109,20 @@ public class SecondAuctioneerAgent extends Agent{
 				// If the received price is higher than last highest price, then update it
 				// as the latest highest price
 				if (receivedPrice > currentPrice) {
-                                        System.out.println("test1 :" + currentPrice);
-					int secondPrice = currentPrice;
-                                        currentPrice = receivedPrice;
-                                        System.out.println(" test2 :" + currentPrice);
-                                        System.out.println(" test3 :" + secondPrice);
+					System.out.println("test1 :" + currentPrice);
+					secondPrice = currentPrice;
+					currentPrice = receivedPrice;
+					System.out.println(" test2 :" + currentPrice);
+					System.out.println(" test3 :" + secondPrice);
 					currentBidder = sender;
 					currentBidderAid = msg.getSender();
-					System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++");
-					System.out.println("The auctioneer announces that the latest highest price is " + msg.getContent());
-					System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++");
-					System.out.println("");
-					getNewPrice = true;
+
+				} else {
+					if (receivedPrice > secondPrice) {
+						secondPrice = receivedPrice;
+					}
 				}
-			}
-			else {
+			} else {
 				block();
 			}
 		}
@@ -150,7 +131,7 @@ public class SecondAuctioneerAgent extends Agent{
 	/*
 	 * behaviour for closing the acution
 	 */
-	
+
 	private class CloseAuction extends CyclicBehaviour {
 		public void action() {
 			// if there is no new bid receive in 5s, then award the acution good to the
@@ -159,20 +140,19 @@ public class SecondAuctioneerAgent extends Agent{
 				closeAuction = true;
 				System.out.println(" ");
 				System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-				System.out.println("The auction is closed, the " + auctionGood + " was sold to " + currentBidder + " with the price " + String.valueOf(currentPrice));
+				System.out.println("The auction is closed, the " + auctionGood + " was sold to " + currentBidder + " with the price " + String.valueOf(secondPrice));
 				System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 				System.out.println(" ");
 				ACLMessage cfp = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
 				cfp.addReceiver(currentBidderAid);
 				cfp.setContent(String.valueOf(currentPrice));
 				cfp.setConversationId(auctionGood);
-				cfp.setReplyWith("cfp"+System.currentTimeMillis()); // Unique value
+				cfp.setReplyWith("cfp" + System.currentTimeMillis()); // Unique value
 				myAgent.send(cfp);
 				myAgent.doDelete();
-			}
-			else {
+			} else {
 			}
 		}
 	}
-	
+
 }

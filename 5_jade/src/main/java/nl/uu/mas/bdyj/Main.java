@@ -73,22 +73,19 @@ class Main{
 	}
 	public static void startContainer(jade.wrapper.AgentContainer container) throws StaleProxyException {
 		Item tem = new Item("candy");
-		container.acceptNewAgent("timmy", new BidderAgent(
-				new RandomValuation(
+		container.acceptNewAgent("timmy", new SecondBidderAgent(
 						new ConstantItemValuation(120)
-				), tem)
+				, tem)
 		).start();
-		container.acceptNewAgent("hendrik", new BidderAgent(
-				new RandomScaledValuation(
+		container.acceptNewAgent("hendrik", new SecondBidderAgent(
 						new ConstantItemValuation(100)
-				), tem)
+				, tem)
 		).start();
-		container.acceptNewAgent("pim", new BidderAgent(
-				new ConstantIncrease(
-						new ConstantItemValuation(130), 1
-				), tem)
+		container.acceptNewAgent("pim", new SecondBidderAgent(
+						new ConstantItemValuation(130)
+				, tem)
 		).start();
-		container.acceptNewAgent("leo", new AuctioneerAgent(0,tem.name)).start();
+		container.acceptNewAgent("leo", new SecondAuctioneerAgent(0,tem.name)).start();
 	}
 
 }
