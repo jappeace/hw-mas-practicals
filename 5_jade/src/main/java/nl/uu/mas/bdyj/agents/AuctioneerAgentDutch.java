@@ -24,7 +24,6 @@ public class AuctioneerAgentDutch extends AAuctioneer{
 
 	protected void setup() {
 		super.setup();
-		System.out.println("Hello! AuctioneerAgent " + getAID().getLocalName() + " is ready.");
 		addBehaviour(new SendPrice(this, 10));
 	}
 

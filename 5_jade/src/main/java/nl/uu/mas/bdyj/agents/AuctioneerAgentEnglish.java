@@ -23,12 +23,8 @@ public class AuctioneerAgentEnglish extends AAuctioneer{
 
 	protected void setup() {
 		super.setup();
-		System.out.println("Hello! AuctioneerAgent " + getAID().getLocalName() + " is ready.");
-		final Agent a = this;
 
 		addBehaviour(new SendPrice(this, 1000));
-
-
 		addBehaviour(new TickerBehaviour(this, 1000) {
 			protected void onTick() {
 				timer = timer + 1;

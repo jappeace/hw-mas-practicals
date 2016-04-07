@@ -23,7 +23,6 @@ public class AuctioneerAgentSecond extends AAuctioneer{
 
 	protected void setup() {
 		super.setup();
-		System.out.println("Hello! AuctioneerAgent " + getAID().getLocalName() + " is ready.");
 		addBehaviour(new WakerBehaviour(this, 5000) {
 			protected void onWake() {
 				closeAuction();

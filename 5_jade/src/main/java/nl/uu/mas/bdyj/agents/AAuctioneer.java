@@ -33,6 +33,10 @@ abstract public class AAuctioneer extends Agent{
 		this.startingPrice = startingPrice;
 		currentPrice = startingPrice;
 	}
+	protected void setup() {
+		addBehaviour(new ReceiveBid());
+		System.out.println("Hello! AuctioneerAgent " + getAID().getLocalName() + " is ready.");
+	}
 	public void broadcast(String str){
 		DFAgentDescription template = new DFAgentDescription();
 		ServiceDescription sd = new ServiceDescription();
@@ -54,9 +58,6 @@ abstract public class AAuctioneer extends Agent{
 		} catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
-	}
-	protected void setup() {
-		addBehaviour(new ReceiveBid());
 	}
 	// Put agent clean-up operations here
 	protected void takeDown() {
