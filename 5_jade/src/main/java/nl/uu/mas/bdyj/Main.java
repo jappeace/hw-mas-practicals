@@ -77,7 +77,7 @@ class Main{
 	public static void startContainer(final jade.wrapper.AgentContainer container) throws StaleProxyException {
 		final Item tem = new Item("candy");
 
-        int auction = 1; // 0 english, 1 dutch, 2 second
+        int auction = 0; // 0 english, 1 dutch, 2 second
         int biddersCount = 10;
         //System.out.println("How many agents do you want:");
         //int numberOfAgents = Integer.parseInt(reader.nextLine());
@@ -112,7 +112,7 @@ class Main{
 					}
 					@Override
 					public void createAuctioneer() throws StaleProxyException {
-						container.acceptNewAgent("leo", new AuctioneerAgentDutch(1000,tem.name,1)).start();
+						container.acceptNewAgent("leo", new AuctioneerAgentDutch(200,tem.name,1)).start();
 					}
 				}, biddersCount);
 				break ;
