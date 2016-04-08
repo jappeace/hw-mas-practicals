@@ -89,4 +89,12 @@ abstract public class ABidderAgent extends Agent{
 			}
 		}
 	}
+
+	protected void cry(int newval, ACLMessage reply){
+		reply.setPerformative(ACLMessage.PROPOSE);
+		reply.setConversationId(auctionGood.name);
+		reply.setContent(newval+"");
+		this.send(reply);
+		System.out.println(getAID().getLocalName() + " cries a price: " + newval);
+	}
 }

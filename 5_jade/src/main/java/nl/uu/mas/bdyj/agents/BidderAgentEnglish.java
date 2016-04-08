@@ -48,14 +48,7 @@ public class BidderAgentEnglish extends ABidderAgent{
 		// and if not given by the bidder agent self
 		// then give a new bid price which is higher than the latest higest price and less than valuation
 		if (!currentBidder.equals(getAID().getLocalName())) {
-			reply.setPerformative(ACLMessage.PROPOSE);
-			reply.setConversationId(auctionGood.name);
-			reply.setContent(newval+"");
-			this.send(reply);
-			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-			System.out.println(getAID().getLocalName() + " cries a higher price: " + newval);
-			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-			System.out.println("");
+			cry(newval, reply);
 		}
 	}
 }

@@ -34,15 +34,7 @@ public class BidderAgentDutch extends ABidderAgent{
 
 		// if the current price is acceptable, then send a bid.
 		if (newval > ANextPriceStrategy.DONT_WANT) {
-			reply.setPerformative(ACLMessage.PROPOSE);
-			reply.setConversationId(auctionGood.name);
-			reply.setContent(currentPrice+"");
-			this.send(reply);
-			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-			System.out.println(getAID().getLocalName() + " cries a bid: " + currentPrice);
-			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-			System.out.println("");
-
+			cry(newval, reply);
 		}
 	}
 }

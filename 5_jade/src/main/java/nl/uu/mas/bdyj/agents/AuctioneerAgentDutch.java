@@ -33,6 +33,7 @@ public class AuctioneerAgentDutch extends AAuctioneer{
 		System.out.println("AuctioneerAgent " + getAID().getLocalName() + " terminating.");
 	}
 
+	int offeredPrice = 0;
 	@Override
 	protected void onReceivePrice(int price, AID bidder) {
 		System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++");
@@ -41,9 +42,14 @@ public class AuctioneerAgentDutch extends AAuctioneer{
 		System.out.println("");
 		currentBidder = bidder.getLocalName();
 		currentBidderAid = bidder;
+		offeredPrice = price;
 		closeAuction();
 	}
 
+	@Override
+	protected int getPrice(){
+		return offeredPrice;
+	}
 	/*
 	 * behaviour for acutioneer to announce the latest higest price
 	 * to every bidder which are still in the acution 
