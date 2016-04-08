@@ -78,7 +78,8 @@ class Main{
 		final Item tem = new Item("candy");
 
         int auction = 2; // 0 english, 1 dutch, 2 second
-        int biddersCount = 10;
+        int biddersCount = 250;
+		final int dutchStartingPrice = 200;
         //System.out.println("How many agents do you want:");
         //int numberOfAgents = Integer.parseInt(reader.nextLine());
 		final List<NextPriceStrategy> strategies = new ArrayList<NextPriceStrategy>();
@@ -112,7 +113,7 @@ class Main{
 					}
 					@Override
 					public void createAuctioneer() throws StaleProxyException {
-						container.acceptNewAgent("leo", new AuctioneerAgentDutch(1000,tem.name,1)).start();
+						container.acceptNewAgent("leo", new AuctioneerAgentDutch(dutchStartingPrice,tem.name,1)).start();
 					}
 				}, biddersCount);
 				break ;

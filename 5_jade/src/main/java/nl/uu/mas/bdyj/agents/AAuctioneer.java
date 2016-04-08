@@ -26,7 +26,7 @@ abstract public class AAuctioneer extends Agent{
 	String auctionGood;
 	int startingPrice;
 	int currentPrice;
-	String currentBidder;
+	String currentBidder = "";
 	AID currentBidderAid;
 	public static final Logger log = LoggerFactory.getLogger(AAuctioneer.class);
 	private boolean conflictDeal = true;

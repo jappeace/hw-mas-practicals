@@ -28,7 +28,7 @@ public class AuctioneerAgentEnglish extends AAuctioneer{
 		addBehaviour(new TickerBehaviour(this, 1000) {
 			protected void onTick() {
 				timer = timer + 1;
-				if(timer > 5){
+				if(timer >= 5){
 					closeAuction();
 				}
 				System.out.println("timer = " + String.valueOf(timer));

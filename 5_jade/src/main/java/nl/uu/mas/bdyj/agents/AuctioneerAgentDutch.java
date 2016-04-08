@@ -36,6 +36,9 @@ public class AuctioneerAgentDutch extends AAuctioneer{
 	int offeredPrice = 0;
 	@Override
 	protected void onReceivePrice(int price, AID bidder) {
+		if(!currentBidder.equals("")){
+			return;
+		}
 		System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++");
 		System.out.println("The auctioneer announces that the bid price is " + price);
 		System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++");
